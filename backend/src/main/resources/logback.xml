@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<include resource="org/springframework/boot/logging/logback/base.xml"/>
+	<property name="LOG_PATH" value="${LOG_PATH:-${LOG_TEMP:-${java.io.tmpdir:-/tmp}}}"/>
+
+	<appender name="PEER_FILE"
+	          class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<encoder>
+			<pattern>${FILE_LOG_PATTERN}</pattern>
+		</encoder>
+		<file>${LOG_PATH}/peer.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<fileNamePattern>${LOG_PATH}/peer.log.%i</fileNamePattern>
+		</rollingPolicy>
+		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<MaxFileSize>10MB</MaxFileSize>
+		</triggeringPolicy>
+	</appender>
+
+	<logger name="org.bitcoinj.core.PeerGroup" additivity="false">
+		<appender-ref ref="PEER_FILE"/>
+	</logger>
+	<logger name="org.bitcoinj.core.PeerSocketHandler" additivity="false">
+		<appender-ref ref="PEER_FILE"/>
+	</logger>
+	<logger name="org.bitcoinj.core.Peer" additivity="false">
+		<appender-ref ref="PEER_FILE"/>
+	</logger>
+	<logger name="org.bitcoinj.net" additivity="false">
+		<appender-ref ref="PEER_FILE"/>
+	</logger>
+</configuration>
