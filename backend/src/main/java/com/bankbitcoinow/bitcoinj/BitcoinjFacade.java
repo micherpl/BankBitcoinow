@@ -8,7 +8,10 @@ import org.bitcoinj.wallet.SendRequest;
 import org.bitcoinj.wallet.Wallet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class BitcoinjFacade {
 
 	private static final Logger LOG = LoggerFactory.getLogger(BitcoinjFacade.class);
@@ -17,7 +20,10 @@ public class BitcoinjFacade {
 	private final Wallet wallet;
 	private final PeerGroup peerGroup;
 
-	public BitcoinjFacade(NetworkParameters networkParams, Wallet wallet, PeerGroup peerGroup) {
+	@Autowired
+	public BitcoinjFacade(NetworkParameters networkParams,
+	                      Wallet wallet,
+	                      PeerGroup peerGroup) {
 		this.networkParams = networkParams;
 		this.wallet = wallet;
 		this.peerGroup = peerGroup;
