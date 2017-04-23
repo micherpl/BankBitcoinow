@@ -1,4 +1,4 @@
-package com.example;
+package com.bankbitcoinow.bitcoinj;
 
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.NetworkParameters;
