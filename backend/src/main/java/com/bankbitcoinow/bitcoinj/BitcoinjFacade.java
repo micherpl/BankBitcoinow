@@ -10,7 +10,6 @@ import org.bitcoinj.wallet.SendRequest;
 import org.bitcoinj.wallet.Wallet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spongycastle.crypto.params.KeyParameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -44,6 +43,32 @@ public class BitcoinjFacade {
 		throw new IllegalArgumentException("Wallet does not contain SingleKeyTransactionSigner");
 	}
 
+	/**
+	 * Generates new key, adds public part to the wallet
+	 * and return encrypted using given password.
+	 *
+	 * @param password Password used to encrypt key.
+	 * @return Encrypted key with all information (except password) required to decrypt it.
+	 */
+	public EncryptedKey generateNewKey(String password) {
+		ECKey newKey = new ECKey();
+		ECKey publicKey = ECKey.fromPublicOnly(newKey.getPubKeyPoint());
+		Address address = newKey.toAddress(networkParams);
+
+		if (LOG.isDebugEnabled()) {
+			LOG.info("Successfully generated new key: {}", newKey.toStringWithPrivate(networkParams));
+		} else {
+			LOG.info("Successfully generated new key: {}", newKey.toString());
+		}
+
+		LOG.info("Address for new key: {}", address);
+
+		wallet.addWatchedAddress(address);
+		wallet.importKey(publicKey);
+
+		return EncryptedKey.encryptKey(newKey, password);
+	}
+
 	public Address getAddress(String base58) {
 		return Address.fromBase58(networkParams, base58);
 	}
@@ -57,17 +82,18 @@ public class BitcoinjFacade {
 	 * and broadcasts final transaction to the network.
 	 *
 	 * @param sendRequest SendRequest prepared using {@link #prepareSendRequest()}.
-	 * @param key         Key used to sign transaction.
-	 *                    Have to match address specified in {@link SendRequestBuilder#from(Address)}.
-	 * @param aesKey      Optional AES key if {@code key} is encrypted.
+	 * @param encryptedKey Key used to sign transaction.
+	 *                     Have to match address specified in {@link SendRequestBuilder#from(Address)}.
+	 * @param password     Password to decrypt key.
 	 * @return Information about (potentially in progress) broadcast.
 	 *         After successful broadcasting result can be read from {@link TransactionBroadcast#future()}.
 	 */
 	public synchronized TransactionBroadcast signAndBroadcastSendRequest(SendRequest sendRequest,
-	                                                                     ECKey key,
-	                                                                     KeyParameter aesKey) {
+	                                                                     EncryptedKey encryptedKey,
+	                                                                     String password) {
 		try {
-			transactionSigner.setKey(key, aesKey);
+			ECKey key = encryptedKey.decryptKey(password);
+			transactionSigner.setKey(key, null);
 			wallet.signTransaction(sendRequest);
 		} finally {
 			transactionSigner.clearKey();
