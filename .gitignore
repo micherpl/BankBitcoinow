@@ -1,6 +1,11 @@
 target/
 !.mvn/wrapper/maven-wrapper.jar
 
+logs/*
+backend/logs/*
+wallet/*
+backend/wallet/*
+
 ### STS ###
 .apt_generated
 .classpath
