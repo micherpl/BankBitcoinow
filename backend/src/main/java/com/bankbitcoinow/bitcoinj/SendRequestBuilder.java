@@ -68,6 +68,7 @@ public class SendRequestBuilder {
 
 		sendRequest.coinSelector = new AddressCoinSelector(sourceAddress);
 		sendRequest.signInputs = false;
+		sendRequest.missingSigsMode = Wallet.MissingSigsMode.USE_DUMMY_SIG;
 		wallet.completeTx(sendRequest);
 
 		return sendRequest;

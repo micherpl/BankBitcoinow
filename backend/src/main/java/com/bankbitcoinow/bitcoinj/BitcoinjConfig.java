@@ -6,6 +6,9 @@ import org.bitcoinj.core.Context;
 import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.core.PeerGroup;
 import org.bitcoinj.core.listeners.DownloadProgressTracker;
+import org.bitcoinj.crypto.ChildNumber;
+import org.bitcoinj.crypto.DeterministicKey;
+import org.bitcoinj.crypto.HDKeyDerivation;
 import org.bitcoinj.net.discovery.DnsDiscovery;
 import org.bitcoinj.params.TestNet3Params;
 import org.bitcoinj.store.BlockStore;
@@ -15,6 +18,7 @@ import org.bitcoinj.wallet.UnreadableWalletException;
 import org.bitcoinj.wallet.Wallet;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 
 import java.io.File;
 import java.io.IOException;
@@ -62,13 +66,27 @@ public class BitcoinjConfig {
 
 	@Bean
 	public Wallet wallet(Context context) throws UnreadableWalletException {
-		File walletFile = new File("wallet/btc-wallet-v2-testnet");
+		File walletFile = new File("wallet/btc-watching-wallet-testnet");
 
 		Wallet wallet;
 		if (walletFile.exists()) {
 			wallet = Wallet.loadFromFile(walletFile);
 		} else {
-			wallet = new Wallet(context);
+			SingleKeyTransactionSigner transactionSigner = transactionSigner();
+
+			// We will generate, store and use private keys by ourselves,
+			// but we need Wallet to watch for incoming transactions.
+			// We need to create wallet from watching key to be able to add
+			// other watching keys - Wallet does not allow to contain mixed keys.
+			// Watching key is not important, because keys (and addresses)
+			// generated from it will not receive any transactions.
+			DeterministicKey masterKey = HDKeyDerivation.createMasterPrivateKey("123456789".getBytes());
+			ChildNumber childNumber = new ChildNumber(0, true);
+			DeterministicKey accountKey = HDKeyDerivation.deriveChildKey(masterKey, childNumber);
+			DeterministicKey watchingKey = accountKey.dropPrivateBytes().dropParent();
+
+			wallet = Wallet.fromWatchingKey(context.getParams(), watchingKey);
+			wallet.addTransactionSigner(transactionSigner);
 		}
 
 		wallet.autosaveToFile(walletFile, 5, TimeUnit.SECONDS, null);
@@ -83,6 +101,22 @@ public class BitcoinjConfig {
 		}, "Wallet shutdown hook"));
 
 		return wallet;
+	}
+
+	/**
+	 * <p>Creates new transaction signer.</p>
+	 *
+	 * <p>Used instead of {@code @Component} and autowired argument in {@link #wallet(Context)}
+	 * to prevent creating unnecessary bean instance when Wallet is loaded from file.
+	 *
+	 * <p>Alternatively {@link org.springframework.beans.factory.BeanFactoryAware},
+	 * {@link org.springframework.beans.factory.BeanFactory#getBean(Class)}
+	 * and {@link org.springframework.stereotype.Component} could be used.</p>
+	 */
+	@Bean
+	@Lazy
+	public SingleKeyTransactionSigner transactionSigner() {
+		return new SingleKeyTransactionSigner();
 	}
 
 	@Bean
