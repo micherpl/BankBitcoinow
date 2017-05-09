@@ -20,7 +20,8 @@ public class Address {
     private Set<Transaction> transactions;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "address_seq_gen")
+    @SequenceGenerator(name = "address_seq_gen", sequenceName = "address_id_seq")
     public Long getId() {
         return id;
     }
