@@ -1,8 +1,6 @@
 package com.bankbitcoinow.bitcoinj;
 
 import com.bankbitcoinow.models.TransactionStatus;
-import com.bankbitcoinow.models.User;
-import com.bankbitcoinow.services.UserService;
 import org.bitcoinj.core.AbstractBlockChain;
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Sha256Hash;
@@ -25,9 +23,6 @@ import org.springframework.stereotype.Component;
 import com.bankbitcoinow.services.AddressService;
 import com.bankbitcoinow.services.TransactionService;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.security.SecureRandom;
 import java.sql.Timestamp;
 
 @Component
@@ -38,85 +33,24 @@ public class TransactionUpdater implements CommandLineRunner, TransactionConfide
 
 	private final Wallet wallet;
 	private final AbstractBlockChain blockChain;
-	private final BitcoinjFacade bitcoinjFacade;
 	private final AddressService addressService;
 	private final TransactionService transactionService;
-	private final UserService userService;
 
 	@Autowired
 	public TransactionUpdater(Wallet wallet,
 	                          AbstractBlockChain blockChain,
-	                          BitcoinjFacade bitcoinjFacade,
 	                          AddressService addressService,
-	                          TransactionService transactionService,
-	                          UserService userService) {
+	                          TransactionService transactionService) {
 		this.wallet = wallet;
 		this.blockChain = blockChain;
-		this.bitcoinjFacade = bitcoinjFacade;
 		this.addressService = addressService;
 		this.transactionService = transactionService;
-		this.userService = userService;
 	}
 
 	@Override
 	public void run(String... args) throws Exception {
 		LOG.info("Preparing TransactionUpdater...");
 		registerWalletListeners();
-
-		User user = getOrCreateUser("koziol.pawel@gmail.com", "!QAZ2wsx");
-		getOrCreateAddress(user, generateKeyForSeed(123, "!QAZ2wsx"));
-		getOrCreateAddress(user, generateKeyForSeed(123456, "!QAZ2wsx"));
-		getOrCreateAddress(user, generateKeyForSeed(654321, "!QAZ2wsx"));
-	}
-
-	private User getOrCreateUser(String email, String password) {
-		User user = userService.findByEmail(email);
-
-		if (user != null) {
-			LOG.info("Found user {} in database. ID: {}", user.getEmail(), user.getId());
-		} else {
-			LOG.info("Creating new user...");
-			user = new User();
-			user.setEmail(email);
-			user.setPassword(password);
-			user.setCreatedAt(new Timestamp(System.currentTimeMillis()));
-			user = userService.save(user);
-			LOG.info("User created. ID: {}", user.getId());
-		}
-
-		return user;
-	}
-
-	private EncryptedKey generateKeyForSeed(int seed, String password) {
-		try {
-			SecureRandom secureRandom = new SecureRandom();
-			secureRandom.setSeed(seed);
-			bitcoinjFacade.setSecureRandom(secureRandom);
-			return bitcoinjFacade.generateNewKey(password);
-		} finally {
-			bitcoinjFacade.setSecureRandom(null);
-		}
-	}
-
-	private com.bankbitcoinow.models.Address getOrCreateAddress(User user, EncryptedKey encryptedKey) throws IOException {
-		String addressStr = encryptedKey.getAddress(wallet.getParams());
-		com.bankbitcoinow.models.Address address = addressService.findByAddress(addressStr);
-
-		if (address != null) {
-			LOG.info("Found address {} in database. ID: {}", addressStr, address.getId());
-		} else {
-			LOG.info("Creating new address...");
-			address = new com.bankbitcoinow.models.Address();
-			address.setUser(user);
-			address.setAddress(addressStr);
-			address.setPrivateKey(encryptedKey.toByteArray());
-			address.setBalance(new BigDecimal(0));
-			address.setCreated_at(new Timestamp(System.currentTimeMillis()));
-			address = addressService.addAddress(address);
-			LOG.info("Address created. ID: {}", address.getId());
-		}
-
-		return address;
 	}
 
 	private void registerWalletListeners() {
