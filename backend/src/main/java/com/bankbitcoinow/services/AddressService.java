@@ -14,8 +14,8 @@ public class AddressService {
     @Autowired
     private AddressRepository addressRepository;
 
-    public void addAddress(Address address){
-        addressRepository.save(address);
+    public Address addAddress(Address address){
+        return addressRepository.save(address);
     }
 
     public void updateAddress(Address address){
