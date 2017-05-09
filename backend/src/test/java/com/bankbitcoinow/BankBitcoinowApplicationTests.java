@@ -1,4 +1,4 @@
-package com.example;
+package com.bankbitcoinow;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
