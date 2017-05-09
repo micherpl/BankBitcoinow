@@ -1,0 +1,1 @@
+ALTER TABLE transaction ADD hash CHAR(64) NULL DEFAULT NULL;
