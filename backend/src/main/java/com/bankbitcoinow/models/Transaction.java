@@ -20,6 +20,7 @@ import java.sql.Timestamp;
 @Table(name = "transaction")
 public class Transaction {
     private Long id;
+    private String hash;
     private String sourceAddress;
     private String destinationAddress;
     private BigDecimal amount;
@@ -38,6 +39,14 @@ public class Transaction {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getHash() {
+        return hash;
+    }
+
+    public void setHash(String hash) {
+        this.hash = hash;
     }
 
     public String getSourceAddress() {
@@ -110,10 +119,5 @@ public class Transaction {
 
     public void setAddress(Address address) {
         this.address = address;
-    }
-
-    @Transient
-    public void setHash(String hashAsString) {
-        // TODO
     }
 }

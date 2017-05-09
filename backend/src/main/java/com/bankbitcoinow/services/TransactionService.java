@@ -27,7 +27,7 @@ public class TransactionService {
     }
 
     public Transaction find(String hash, String destinationAddress) {
-        return null; // TODO transactionRepository.findByHashAndDestinationAddress(hash, destinationAddress);
+        return transactionRepository.findByHashAndDestinationAddress(hash, destinationAddress);
     }
 
     public void deleteTransaction(Long id){
