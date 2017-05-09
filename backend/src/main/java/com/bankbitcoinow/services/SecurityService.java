@@ -1,4 +1,4 @@
-package services;
+package com.bankbitcoinow.services;
 
 
 public interface SecurityService {

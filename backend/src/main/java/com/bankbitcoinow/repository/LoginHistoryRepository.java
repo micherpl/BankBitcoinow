@@ -1,6 +1,6 @@
-package repository;
+package com.bankbitcoinow.repository;
 
-import models.LoginHistory;
+import com.bankbitcoinow.models.LoginHistory;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface LoginHistoryRepository extends JpaRepository<LoginHistory, Long> {

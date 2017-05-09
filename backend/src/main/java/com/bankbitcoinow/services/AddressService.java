@@ -1,13 +1,15 @@
-package services;
+package com.bankbitcoinow.services;
 
 
-import models.Address;
+import com.bankbitcoinow.models.Address;
 import org.springframework.beans.factory.annotation.Autowired;
-import repository.AddressRepository;
+import org.springframework.stereotype.Service;
+import com.bankbitcoinow.repository.AddressRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class AddressService {
     @Autowired
     private AddressRepository addressRepository;
@@ -22,6 +24,10 @@ public class AddressService {
 
     public void getAddress(Long id){
         addressRepository.findOne(id);
+    }
+
+    public Address findByAddress(String address) {
+        return addressRepository.findByAddress(address);
     }
 
     public void deleteAddress(Long id){

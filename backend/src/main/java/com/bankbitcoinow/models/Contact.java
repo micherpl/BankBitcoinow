@@ -1,4 +1,4 @@
-package models;
+package com.bankbitcoinow.models;
 
 import javax.persistence.*;
 
@@ -9,10 +9,6 @@ public class Contact {
     private String name;
     private String address;
 
-    @ManyToOne
-    @JoinColumn(name = "id")
-    private User user;
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     public String getId() {
@@ -21,14 +17,6 @@ public class Contact {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 
     public String getName() {

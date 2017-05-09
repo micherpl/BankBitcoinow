@@ -1,7 +1,7 @@
-package services;
+package com.bankbitcoinow.services;
 
 
-import models.User;
+import com.bankbitcoinow.models.User;
 
 public interface UserService {
     void save(User user);

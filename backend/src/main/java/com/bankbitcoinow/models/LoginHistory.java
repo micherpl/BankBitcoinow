@@ -1,4 +1,4 @@
-package models;
+package com.bankbitcoinow.models;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -12,10 +12,6 @@ public class LoginHistory {
     private boolean success;
     private String ip;
 
-    @ManyToOne
-    @JoinColumn(name = "id")
-    private User user;
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     public Long getId() {
@@ -24,14 +20,6 @@ public class LoginHistory {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 
     public Timestamp getDate() {

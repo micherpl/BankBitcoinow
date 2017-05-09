@@ -1,13 +1,15 @@
-package services;
+package com.bankbitcoinow.services;
 
 
-import models.Transaction;
+import com.bankbitcoinow.models.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
-import repository.TransactionRepository;
+import org.springframework.stereotype.Service;
+import com.bankbitcoinow.repository.TransactionRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class TransactionService {
     @Autowired
     private TransactionRepository transactionRepository;
@@ -22,6 +24,10 @@ public class TransactionService {
 
     public void getTransaction(Long id){
         transactionRepository.findOne(id);
+    }
+
+    public Transaction find(String hash, String destinationAddress) {
+        return null; // TODO transactionRepository.findByHashAndDestinationAddress(hash, destinationAddress);
     }
 
     public void deleteTransaction(Long id){

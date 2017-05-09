@@ -1,4 +1,4 @@
-package models;
+package com.bankbitcoinow.models;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -9,14 +9,11 @@ import java.util.Set;
 @Table(name = "address")
 public class Address {
     private Long id;
-    private Long user_id;
     private String address;
-    private byte private_key;
+    private byte[] privateKey;
     private BigDecimal balance;
     private Timestamp created_at;
 
-    @ManyToOne
-    @JoinColumn(name = "id")
     private User user;
 
     @OneToMany(mappedBy = "address", cascade = CascadeType.ALL)
@@ -32,14 +29,6 @@ public class Address {
         this.id = id;
     }
 
-    public Long getUser_id() {
-        return user_id;
-    }
-
-    public void setUser_id(Long user_id) {
-        this.user_id = user_id;
-    }
-
     public String getAddress() {
         return address;
     }
@@ -48,12 +37,12 @@ public class Address {
         this.address = address;
     }
 
-    public byte getPrivate_key() {
-        return private_key;
+    public byte[] getPrivateKey() {
+        return privateKey;
     }
 
-    public void setPrivate_key(byte private_key) {
-        this.private_key = private_key;
+    public void setPrivateKey(byte[] privateKey) {
+        this.privateKey = privateKey;
     }
 
     public BigDecimal getBalance() {
@@ -70,5 +59,15 @@ public class Address {
 
     public void setCreated_at(Timestamp created_at) {
         this.created_at = created_at;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

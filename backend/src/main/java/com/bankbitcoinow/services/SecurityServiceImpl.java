@@ -1,4 +1,4 @@
-package services;
+package com.bankbitcoinow.services;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class SecurityServiceImpl implements SecurityService{
-    @Autowired
+//    @Autowired
     private AuthenticationManager authenticationManager;
 
     @Autowired

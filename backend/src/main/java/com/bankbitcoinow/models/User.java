@@ -1,4 +1,4 @@
-package models;
+package com.bankbitcoinow.models;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -11,15 +11,6 @@ public class User {
     private String password;
     private String email;
     private String otp_keyid;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Set<Address> addresses;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Set<Contact> contacts;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Set<LoginHistory> loginHistories;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -61,29 +52,5 @@ public class User {
 
     public void setOtp_keyid(String otp_keyid) {
         this.otp_keyid = otp_keyid;
-    }
-
-    public Set<Address> getAddresses() {
-        return addresses;
-    }
-
-    public void setAddresses(Set<Address> addresses) {
-        this.addresses = addresses;
-    }
-
-    public Set<Contact> getContacts() {
-        return contacts;
-    }
-
-    public void setContacts(Set<Contact> contacts) {
-        this.contacts = contacts;
-    }
-
-    public Set<LoginHistory> getLoginHistories() {
-        return loginHistories;
-    }
-
-    public void setLoginHistories(Set<LoginHistory> loginHistories) {
-        this.loginHistories = loginHistories;
     }
 }

@@ -1,12 +1,12 @@
-package validator;
+package com.bankbitcoinow.validator;
 
-import models.User;
+import com.bankbitcoinow.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
-import services.UserService;
+import com.bankbitcoinow.services.UserService;
 
 @Component
 public class UserValidator implements Validator {

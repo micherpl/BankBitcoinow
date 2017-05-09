@@ -1,6 +1,6 @@
-package controllers;
+package com.bankbitcoinow.controllers;
 
-import models.User;
+import com.bankbitcoinow.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import services.SecurityService;
-import services.UserService;
-import validator.UserValidator;
+import com.bankbitcoinow.services.SecurityService;
+import com.bankbitcoinow.services.UserService;
+import com.bankbitcoinow.validator.UserValidator;
 
 @RestController
 public class UserController {

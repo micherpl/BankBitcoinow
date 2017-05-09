@@ -1,10 +1,9 @@
-package controllers;
+package com.bankbitcoinow.controllers;
 
-import models.Transaction;
+import com.bankbitcoinow.models.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import services.TransactionService;
+import com.bankbitcoinow.services.TransactionService;
 
 @RestController
 public class TransactionController {
