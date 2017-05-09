@@ -103,18 +103,18 @@ public class TransactionUpdater implements CommandLineRunner, TransactionConfide
 	private void registerWalletListeners() {
 		LOG.info("Registering wallet listeners...");
 
-		wallet.addChangeEventListener(w -> LOG.info("Wallet changed"));
-		wallet.addCoinsReceivedEventListener((w, tx, prevBalance, newBalance) -> LOG.info("Coins received in transaction {}. Prev: {}. New: {}", tx, prevBalance, newBalance));
-		wallet.addCoinsSentEventListener((w, tx, prevBalance, newBalance) -> LOG.info("Coins sent in transaction {}. Prev: {}. New: {}", tx, prevBalance, newBalance));
-		wallet.addTransactionConfidenceEventListener((w, tx) -> LOG.info("Transaction confidence chanced for: {}. Value: {}", tx, tx.getConfidence()));
+		wallet.addChangeEventListener(w -> LOG.debug("Wallet changed"));
+		wallet.addCoinsReceivedEventListener((w, tx, prevBalance, newBalance) -> LOG.debug("Coins received in transaction {}. Prev: {}. New: {}", tx, prevBalance, newBalance));
+		wallet.addCoinsSentEventListener((w, tx, prevBalance, newBalance) -> LOG.debug("Coins sent in transaction {}. Prev: {}. New: {}", tx, prevBalance, newBalance));
+		wallet.addTransactionConfidenceEventListener((w, tx) -> LOG.debug("Transaction confidence chanced for: {}. Value: {}", tx, tx.getConfidence()));
 		wallet.addTransactionConfidenceEventListener(this);
 
 		blockChain.addTransactionReceivedListener(new TransactionReceivedInBlockListener() {
 			@Override
 			public void receiveFromBlock(Transaction tx, StoredBlock block, AbstractBlockChain.NewBlockType blockType, int relativityOffset) throws VerificationException {
-				LOG.info("Received transaction from block: {}", tx);
-				LOG.info("Relative offset: {}", relativityOffset);
-				LOG.info("Wallet: {}", wallet);
+				LOG.debug("Received transaction from block: {}", tx);
+				LOG.debug("Relative offset: {}", relativityOffset);
+				LOG.debug("Wallet: {}", wallet);
 			}
 
 			@Override
@@ -126,19 +126,21 @@ public class TransactionUpdater implements CommandLineRunner, TransactionConfide
 
 	@Override
 	public void onTransactionConfidenceChanged(Wallet wallet, Transaction tx) {
-		LOG.info("Confidence changed for transaction: {}", tx);
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("Confidence changed for transaction: {}", tx);
+		}
 
 		for (TransactionOutput txOutput : tx.getOutputs()) {
-			LOG.info("Checking output: {}", txOutput);
+			LOG.debug("Checking output: {}", txOutput);
 
 			Script script = txOutput.getScriptPubKey();
 			if (!script.isSentToAddress()) {
-				LOG.info("Only outputs sent to address are supported - skipping");
+				LOG.debug("Only outputs sent to address are supported - skipping");
 				continue;
 			}
 
 			if (!txOutput.isMineOrWatched(wallet)) {
-				LOG.info("Output is not related to any key in wallet - skipping");
+				LOG.debug("Output is not related to any key in wallet - skipping");
 				continue;
 			}
 
@@ -156,7 +158,7 @@ public class TransactionUpdater implements CommandLineRunner, TransactionConfide
 	}
 
 	private void updateExistingTransaction(Transaction tx, com.bankbitcoinow.models.Transaction transaction) {
-		LOG.info("Found existing transaction in database");
+		LOG.debug("Found existing transaction in database");
 
 		TransactionConfidence confidence = tx.getConfidence();
 		TransactionStatus currentStatus = transaction.getStatus();
