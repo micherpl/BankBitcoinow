@@ -1,33 +1,26 @@
 package com.bankbitcoinow.models;
 
 import javax.persistence.*;
-import java.util.Set;
+import java.sql.Timestamp;
 
 @Entity
-@Table(name = "user")
+@Table(name = "\"user\"")
 public class User {
     private Long id;
-    private String username;
     private String password;
     private String email;
-    private String otp_keyid;
+    private String otpKeyid;
+    private Timestamp createdAt;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq_gen")
+    @SequenceGenerator(name = "user_seq_gen", sequenceName = "user_id_seq")
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public String getPassword() {
@@ -46,11 +39,19 @@ public class User {
         this.email = email;
     }
 
-    public String getOtp_keyid() {
-        return otp_keyid;
+    public String getOtpKeyid() {
+        return otpKeyid;
     }
 
-    public void setOtp_keyid(String otp_keyid) {
-        this.otp_keyid = otp_keyid;
+    public void setOtpKeyid(String otpKeyid) {
+        this.otpKeyid = otpKeyid;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
     }
 }
