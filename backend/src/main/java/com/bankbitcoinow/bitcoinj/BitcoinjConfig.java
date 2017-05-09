@@ -28,17 +28,6 @@ import java.util.concurrent.TimeUnit;
 public class BitcoinjConfig {
 
 	@Bean
-	public DownloadProgressTracker downloadProgressTracker(PeerGroup peerGroup) throws InterruptedException {
-		DownloadProgressTracker listener = new DownloadProgressTracker();
-		peerGroup.startBlockChainDownload(listener);
-
-		// Block context initialization until whole chain finish downloading
-		listener.await();
-
-		return listener;
-	}
-
-	@Bean
 	public PeerGroup peerGroup(Context context,
 	                           AbstractBlockChain blockChain,
 	                           Wallet wallet) {

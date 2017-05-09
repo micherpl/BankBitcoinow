@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import com.bankbitcoinow.services.AddressService;
 import com.bankbitcoinow.services.TransactionService;
@@ -30,6 +31,7 @@ import java.security.SecureRandom;
 import java.sql.Timestamp;
 
 @Component
+@Order(BlockChainDownloader.PRECEDENCE - 1)
 public class TransactionUpdater implements CommandLineRunner, TransactionConfidenceEventListener {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TransactionUpdater.class);
@@ -99,6 +101,8 @@ public class TransactionUpdater implements CommandLineRunner, TransactionConfide
 	}
 
 	private void registerWalletListeners() {
+		LOG.info("Registering wallet listeners...");
+
 		wallet.addChangeEventListener(w -> LOG.info("Wallet changed"));
 		wallet.addCoinsReceivedEventListener((w, tx, prevBalance, newBalance) -> LOG.info("Coins received in transaction {}. Prev: {}. New: {}", tx, prevBalance, newBalance));
 		wallet.addCoinsSentEventListener((w, tx, prevBalance, newBalance) -> LOG.info("Coins sent in transaction {}. Prev: {}. New: {}", tx, prevBalance, newBalance));
