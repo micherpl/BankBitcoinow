@@ -26,8 +26,8 @@ public class TransactionService {
         transactionRepository.findOne(id);
     }
 
-    public Transaction find(String hash, String destinationAddress) {
-        return transactionRepository.findByHashAndDestinationAddress(hash, destinationAddress);
+    public Transaction find(String hash, String address) {
+        return transactionRepository.findByHashAndAddressAddress(hash, address);
     }
 
     public void deleteTransaction(Long id){
