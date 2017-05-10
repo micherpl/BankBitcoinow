@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 @RestController
 public class TransactionController {
@@ -39,6 +41,8 @@ public class TransactionController {
     @Autowired
     private NetworkParameters networkParameters;
 
+    private final ConcurrentMap<Long, SendRequest> preparedSendRequests = new ConcurrentHashMap<>();
+
     @RequestMapping(method = RequestMethod.POST, value="/nowy_przelew")
     public void doTransaction(@RequestBody Transaction transaction) {
         transactionService.addTransaction(transaction);
@@ -46,7 +50,7 @@ public class TransactionController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value="/przygotuj_przelew")
-    public Map<String, Object> doTransaction(@RequestBody Map<String, String> input) throws InsufficientMoneyException {
+    public Map<String, Object> prepareTransaction(@RequestBody Map<String, String> input) throws InsufficientMoneyException {
         String from = input.get("from");
         Assert.hasText(from, "Source address cannot be empty");
 
@@ -74,7 +78,7 @@ public class TransactionController {
         transaction.setAddress(srcAddress);
         transaction.setSourceAddress(from);
         transaction.setDestinationAddress(to);
-        transaction.setAmount(amount);
+        transaction.setAmount(amount.negate());
         transaction.setCreatedAt(new Timestamp(System.currentTimeMillis()));
         transaction.setStatus(TransactionStatus.PREPARED);
         transaction.setConfirmations(0);
@@ -83,6 +87,8 @@ public class TransactionController {
         transaction = transactionService.addTransaction(transaction);
         LOG.info("Transaction created. ID: {}", transaction.getId());
 
+        preparedSendRequests.put(transaction.getId(), sendRequest);
+
         Map<String, Object> result = new HashMap<>();
         result.put("id", transaction.getId());
         result.put("fee", sendRequest.tx.getFee().toPlainString());
@@ -90,8 +96,8 @@ public class TransactionController {
         return result;
     }
 
-    @RequestMapping(method = RequestMethod.GET, value="/podpisz_przelew")
-    public void getAllTransaction(@RequestBody Map<String, String> input) throws IOException {
+    @RequestMapping(method = RequestMethod.POST, value="/podpisz_przelew")
+    public void signTransaction(@RequestBody Map<String, String> input) throws IOException {
         String id = input.get("id");
         Assert.hasText(id, "ID cannot be empty");
 
@@ -103,14 +109,19 @@ public class TransactionController {
             throw new IllegalArgumentException("Transaction " + id + " was not found");
         }
 
-        org.bitcoinj.core.Transaction tx = new org.bitcoinj.core.Transaction(networkParameters, transaction.getBlockchainData());
-        SendRequest sendRequest = SendRequest.forTx(tx);
+        SendRequest sendRequest = preparedSendRequests.getOrDefault(transaction.getId(), null);
+        if (sendRequest == null) {
+            throw new IllegalArgumentException("Send request " + id + " was not found");
+        }
+
         EncryptedKey encryptedKey = EncryptedKey.fromByteArray(transaction.getAddress().getPrivateKey());
         bitcoinjFacade.signSendRequest(sendRequest, encryptedKey, password);
 
+        transaction.setHash(sendRequest.tx.getHashAsString());
         transaction.setStatus(TransactionStatus.SIGNED);
         transaction.setBlockchainData(sendRequest.tx.unsafeBitcoinSerialize());
         transactionService.updateTransction(transaction);
+        preparedSendRequests.remove(transaction.getId());
 
         LOG.info("Transaction signed. ID: {}", transaction.getId());
 
