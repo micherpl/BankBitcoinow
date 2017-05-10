@@ -2,6 +2,7 @@ package com.bankbitcoinow.bitcoinj;
 
 import com.google.protobuf.ByteString;
 import org.bitcoinj.core.ECKey;
+import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.crypto.EncryptedData;
 import org.bitcoinj.crypto.KeyCrypter;
 import org.bitcoinj.crypto.KeyCrypterScrypt;
@@ -63,6 +64,10 @@ public class EncryptedKey {
 
 			return new EncryptedKey(iterations, salt, key);
 		}
+	}
+
+	public String getAddress(NetworkParameters params) {
+		return key.toAddress(params).toBase58();
 	}
 
 	public ECKey decryptKey(String password) {

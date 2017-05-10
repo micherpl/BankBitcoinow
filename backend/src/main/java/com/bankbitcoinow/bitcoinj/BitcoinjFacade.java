@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.security.SecureRandom;
+
 @Component
 public class BitcoinjFacade {
 
@@ -22,6 +24,7 @@ public class BitcoinjFacade {
 	private final Wallet wallet;
 	private final PeerGroup peerGroup;
 	private final SingleKeyTransactionSigner transactionSigner;
+	private SecureRandom secureRandom = null;
 
 	@Autowired
 	public BitcoinjFacade(NetworkParameters networkParams,
@@ -51,7 +54,7 @@ public class BitcoinjFacade {
 	 * @return Encrypted key with all information (except password) required to decrypt it.
 	 */
 	public EncryptedKey generateNewKey(String password) {
-		ECKey newKey = new ECKey();
+		ECKey newKey = secureRandom != null ? new ECKey(secureRandom) : new ECKey();
 		ECKey publicKey = ECKey.fromPublicOnly(newKey.getPubKeyPoint());
 		Address address = newKey.toAddress(networkParams);
 
@@ -100,5 +103,9 @@ public class BitcoinjFacade {
 		}
 
 		return peerGroup.broadcastTransaction(sendRequest.tx);
+	}
+
+	void setSecureRandom(SecureRandom secureRandom) {
+		this.secureRandom = secureRandom;
 	}
 }
