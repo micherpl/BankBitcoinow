@@ -94,6 +94,11 @@ public class BitcoinjFacade {
 	public synchronized TransactionBroadcast signAndBroadcastSendRequest(SendRequest sendRequest,
 	                                                                     EncryptedKey encryptedKey,
 	                                                                     String password) {
+		signSendRequest(sendRequest, encryptedKey, password);
+		return broadcastTransaction(sendRequest);
+	}
+
+	public synchronized void signSendRequest(SendRequest sendRequest, EncryptedKey encryptedKey, String password) {
 		try {
 			ECKey key = encryptedKey.decryptKey(password);
 			transactionSigner.setKey(key, null);
@@ -101,7 +106,9 @@ public class BitcoinjFacade {
 		} finally {
 			transactionSigner.clearKey();
 		}
+	}
 
+	public TransactionBroadcast broadcastTransaction(SendRequest sendRequest) {
 		return peerGroup.broadcastTransaction(sendRequest.tx);
 	}
 

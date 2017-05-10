@@ -14,16 +14,16 @@ public class TransactionService {
     @Autowired
     private TransactionRepository transactionRepository;
 
-    public void addTransaction(Transaction transaction){
-        transactionRepository.save(transaction);
+    public Transaction addTransaction(Transaction transaction){
+        return transactionRepository.save(transaction);
     }
 
     public void updateTransction(Transaction transaction){
         transactionRepository.save(transaction);
     }
 
-    public void getTransaction(Long id){
-        transactionRepository.findOne(id);
+    public Transaction getTransaction(Long id){
+        return transactionRepository.findOne(id);
     }
 
     public Transaction find(String hash, String address) {
