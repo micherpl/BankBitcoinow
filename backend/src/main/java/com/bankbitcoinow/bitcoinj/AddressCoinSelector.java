@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 class AddressCoinSelector implements CoinSelector {
 
-	private final Address searchedAddress;
+	final Address searchedAddress;
 	private final CoinSelector delegate;
 
 	public AddressCoinSelector(Address searchedAddress) {
