@@ -79,6 +79,8 @@ public class TransactionUpdater implements CommandLineRunner, TransactionConfide
 				return false;
 			}
 		});
+
+		LOG.info("Wallet listeners registered");
 	}
 
 	@Override
