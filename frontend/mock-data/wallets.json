@@ -1,0 +1,23 @@
+[
+    {
+        "id": "1",
+        "name": "Main wallet",
+        "balance": 0.563,
+        "address": "1EdVuraZCVhS2zi7eAevVtpHvPQtHtWdAR",
+        "created_at": ""
+    },
+    {
+        "id": "2",
+        "name": "Second wallet",
+        "balance": 0.14,
+        "address": "15gzCLV3QmzoGityuFQectEDpg7iP5ZNpo",
+        "created_at": ""
+    },
+    {
+        "id": "3",
+        "name": "Third wallet",
+        "balance": 0.1234,
+        "address": "1JRbGaPt5k7F9FmBkM9RbLbHY5JyY4RfD9",
+        "created_at": ""
+    }
+]
