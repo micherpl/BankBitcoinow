@@ -19,11 +19,7 @@ public class SendRequestBuilderTest {
 
 	@Test
 	public void testBasicProperties() throws Exception {
-		SendRequest sendRequest = new SendRequestBuilder(wallet)
-				.from(TestUtils.newRandomAddress())
-				.to(TestUtils.newRandomAddress())
-				.amount(Coin.COIN)
-				.prepare();
+		SendRequest sendRequest = TestUtils.newRandomSendRequest(wallet);
 
 		assertFalse(sendRequest.emptyWallet);
 		assertFalse(sendRequest.signInputs);

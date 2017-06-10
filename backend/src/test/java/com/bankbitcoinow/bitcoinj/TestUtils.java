@@ -4,10 +4,12 @@ import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.Context;
 import org.bitcoinj.core.ECKey;
+import org.bitcoinj.core.InsufficientMoneyException;
 import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.core.TransactionOutput;
-import org.bitcoinj.params.TestNet3Params;
 import org.bitcoinj.script.Script;
+import org.bitcoinj.wallet.SendRequest;
+import org.bitcoinj.wallet.Wallet;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -50,5 +52,13 @@ class TestUtils {
 
 	static Coin randomCoin() {
 		return Coin.valueOf(Math.abs(RANDOM.nextInt()));
+	}
+
+	static SendRequest newRandomSendRequest(Wallet wallet) throws InsufficientMoneyException {
+		return new SendRequestBuilder(wallet)
+				.from(TestUtils.newRandomAddress())
+				.to(TestUtils.newRandomAddress())
+				.amount(randomCoin())
+				.prepare();
 	}
 }
