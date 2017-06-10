@@ -15,7 +15,7 @@ import java.util.Random;
 
 class TestUtils {
 
-	static final NetworkParameters PARAMS = TestNet3Params.get();
+	static final NetworkParameters PARAMS = BitcoinjConfig.BitcoinjUnitTestConfig.PARAMS;
 	static final Random RANDOM = new Random();
 
 	static {

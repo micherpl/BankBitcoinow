@@ -106,6 +106,8 @@ public class BitcoinjConfig {
 	@Profile("test")
 	public static class BitcoinjUnitTestConfig {
 
+		static final UnitTestParams PARAMS = UnitTestParams.get();
+
 		@Bean
 		public Wallet wallet(Context context) throws UnreadableWalletException {
 			return createNewWallet(context);
@@ -132,7 +134,7 @@ public class BitcoinjConfig {
 
 		@Bean
 		public NetworkParameters networkParameters() {
-			return UnitTestParams.get();
+			return PARAMS;
 		}
 	}
 
