@@ -2,34 +2,33 @@
 
 angular.module('registration').component('registration', {
     templateUrl: 'components/registration/registration.template.html',
-    controller:  function RegistrationController($http) {
-        this.username = "";
-        this.password = "";
+    controller:  function RegistrationController($http, $location) {
+	    var ctrl = this;
 
-        var vm = this;
+	    ctrl.email = "";
+	    ctrl.password = "";
+	    ctrl.serverErrors = {};
 
-        vm.register = function() {
+        ctrl.register = function() {
+	        ctrl.serverErrors = {};
 
-            // var data = {
-            //     username: this.username,
-            //     password: this.password
-            // };
-            //
-            // var config = {
-            //     headers : {
-            //         'Content-Type': 'application/json'
-            //     }
-            // };
+            var data = {
+                email: ctrl.email,
+                password: ctrl.password
+            };
 
-
-            // $http.get('http://localhost:8080/registration').success(function(data){
-            //     alert(1);
-            //     vm.ResponseDetails = data;
-            //
-            // }).error(function(data){
-            //     alert(2);
-            //     vm.ResponseDetails = data.data;
-            // });
+            $http.post('http://localhost:8080/registration', data).success(function(data){
+	            $location.path('start');
+            }).error(function(data){
+                if (data.errors) {
+	                for (var fieldName in data.errors.fields) {
+		                ctrl.serverErrors[fieldName] = data.errors.fields[fieldName];
+	                }
+                } else {
+                	console.log('Unknown response:', data);
+                    alert('Unexpected error. Please check logs or try again later.');
+                }
+            });
 
         };
 }

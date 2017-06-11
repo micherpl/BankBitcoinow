@@ -1,6 +1,6 @@
 package com.bankbitcoinow.validator;
 
-import com.bankbitcoinow.models.User;
+import com.bankbitcoinow.controllers.UserController.RegistrationForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -15,24 +15,28 @@ public class UserValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> aClass) {
-        return User.class.equals(aClass);
+        return RegistrationForm.class.equals(aClass);
     }
 
     @Override
     public void validate(Object o, Errors errors) {
-        User user = (User) o;
+        RegistrationForm registrationForm = (RegistrationForm) o;
 
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "email", "NotEmpty");
-        if (user.getEmail().length() < 6 || user.getEmail().length() > 255) {
-            errors.rejectValue("email", "Size.userForm.email");
-        }
-        if (userService.findByEmail(user.getEmail()) != null) {
-            errors.rejectValue("email", "Duplicate.userForm.email");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "email", "NotEmpty", "Email is required");
+        if (!errors.hasFieldErrors("email")) {
+            if (registrationForm.getEmail().length() < 6 || registrationForm.getEmail().length() > 255) {
+                errors.rejectValue("email", "Size.userForm.email", "Email has to be between 6 and 255 characters");
+            }
+            if (userService.findByEmail(registrationForm.getEmail()) != null) {
+                errors.rejectValue("email", "Duplicate.userForm.email", "Email already registered");
+            }
         }
 
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password", "NotEmpty");
-        if (user.getPassword().length() < 8 || user.getPassword().length() > 32) {
-            errors.rejectValue("password", "Size.userForm.password");
+        if (!errors.hasFieldErrors("password")) {
+            if (registrationForm.getPassword().length() < 8 || registrationForm.getPassword().length() > 32) {
+                errors.rejectValue("password", "Size.userForm.password", "Password has to be betweeen 8 and 32 characters");
+            }
         }
 
 //        if (!user.getPasswordConfirm().equals(user.getPassword())) {
