@@ -17,7 +17,7 @@ angular.module('registration').component('registration', {
                 password: ctrl.password
             };
 
-            $http.post('http://localhost:8080/registration', data).success(function(data){
+            $http.post(window.location.protocol+'//'+window.location.hostname+':8080/registration', data).success(function(data){
 	            $location.path('start');
             }).error(function(data){
                 if (data.errors) {
