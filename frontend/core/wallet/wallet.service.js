@@ -2,7 +2,7 @@
 
 angular.module('core.wallet').factory('Wallet', ['$resource',
     function ($resource) {
-        return $resource('../../mock-data/:walletId.json', {}, {
+        return $resource('mock-data/:walletId.json', {}, {
             query: {
                 method: 'GET',
                 params: {walletId: 'wallets'},
