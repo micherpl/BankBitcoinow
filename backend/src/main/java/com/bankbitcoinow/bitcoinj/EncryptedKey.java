@@ -72,10 +72,6 @@ public class EncryptedKey {
 
 	public ECKey decryptKey(String password) {
 		KeyCrypter keyCrypter = key.getKeyCrypter();
-		if (keyCrypter == null) {
-			keyCrypter = getKeyCrypter(iterations, salt);
-		}
-
 		KeyParameter aesKey = keyCrypter.deriveKey(password);
 		return key.decrypt(keyCrypter, aesKey);
 	}

@@ -21,7 +21,16 @@ public class BankBitcoinowApplication {
 		protected void configure(HttpSecurity http) throws Exception {
 			http.authorizeRequests()
 					.anyRequest().permitAll();
+
 			http.csrf().disable();
+		}
+	}
+
+	@Configuration
+	public class MvcConfig extends WebMvcConfigurerAdapter {
+		@Override
+		public void addCorsMappings(CorsRegistry registry) {
+			registry.addMapping("/**").allowedOrigins("*");
 		}
 	}
 }
