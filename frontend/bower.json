@@ -1,0 +1,26 @@
+{
+  "name": "BitVault",
+  "description": "Your bitcoin bank",
+  "homepage": "https://github.com/micherpl/BankBitcoinow",
+  "authors": [
+    "Michał Herman",
+    "Paweł Kozioł",
+    "Jakub Słowik"
+  ],
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-animate": "1.5.x",
+    "angular-bootstrap": "^2.5.0",
+    "angular-mocks": "1.5.x",
+    "angular-resource": "1.5.x",
+    "angular-route": "1.5.x",
+    "bootstrap": "3.3.x"
+  }
+}
