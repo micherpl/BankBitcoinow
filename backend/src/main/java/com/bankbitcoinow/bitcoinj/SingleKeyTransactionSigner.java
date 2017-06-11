@@ -111,7 +111,7 @@ public class SingleKeyTransactionSigner extends StatelessTransactionSigner {
 
 			Script scriptPubKey = txIn.getConnectedOutput().getScriptPubKey();
 			if (!scriptPubKey.isSentToAddress()) {
-				LOG.warn("MyTransactionSigner2 works only with pay-to-address transactions");
+				LOG.warn("SingleKeyTransactionSigner works only with pay-to-address transactions");
 				return false;
 			}
 
