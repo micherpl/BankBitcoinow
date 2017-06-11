@@ -1,4 +1,5 @@
 @import url("fonts.css");
+@import url("modal.css");
 
 [ng\:cloak], [ng-cloak], .ng-cloak {
     display: none !important;
@@ -211,7 +212,8 @@ a:hover {
 
 .wallet-item:hover {
 
-    background-color: #ff8908;
+    background-color: #f09342;
+
     color: ghostwhite;
     cursor: default;
 }

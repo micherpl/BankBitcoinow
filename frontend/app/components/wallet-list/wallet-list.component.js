@@ -23,83 +23,135 @@
 
 'use strict';
 
+angular.module('walletList')
+    .controller('newWalletModalController', function($uibModalInstance, key, $http) {
+
+
+        var vm = this;
+
+        vm.newWallet = {};
+
+        vm.featureName = key;
+
+
+
+        vm.generateWallet = function (){
+
+            var parameter = {
+                email : "ddd@ddd.pl",
+                password: vm.newWallet.password
+            };
+
+            var url = "http://localhost:8080/generuj_adres";
+
+            $http.post(url, JSON.stringify(parameter),{headers: {'Content-type' : 'application/json'}}).success(function(data){
+                alert(1);
+            }).error(function(data){
+                alert(2);
+            });
+
+
+        };
+
+        vm.close = function () {
+            $uibModalInstance.close('yes');
+        };
+
+    });
+
+
 angular.module('walletList').component('walletList', {
     templateUrl: 'components/wallet-list/wallet-list.template.html',
     controllerAs: "walletListCtrl",
-    controller: ['Wallet',
-        function WalletListController(Wallet) {
+    controller: ['Wallet', '$uibModal',
+        function WalletListController(Wallet, $uibModal) {
 
-            this.wallets = Wallet.query();
-            // this.orderProp = 'age';
+            var vm = this;
 
+            vm.test = 1111;
 
-            // this.transactions = Transactions.query();
+            vm.message = 'It works!';
 
+            var key = 1000;
 
-            this.loggedInUser = {
-                "firstName": "Jakub",
-                "lastName": "Słowik"
+            vm.modal = function() {
+                var modalInstance = $uibModal.open({
+                    controller: 'newWalletModalController as newWalletModalCtrl',
+                    templateUrl: 'components/wallet-list/modal.html',
+                    windowClass: 'center-modal',
+                    resolve: {
+                        key: function() {
+                            return key;
+                        }
+                    }
+                });
+                modalInstance.result.then(function(optionSelected) {
+                    if (optionSelected === 'yes') {
+                        console.log("Yes selected!")
+                    }
+                })
             };
 
 
 
-            this.getTotalBitcoinAmmount = function(){
+
+            vm.wallets = Wallet.query();
+            // this.orderProp = 'age';
+
+            // this.transactions = Transactions.query();
+
+
+            vm.loggedInUser = {
+                "firstName": "Jakub",
+                "lastName": "Słowik"
+            };
+
+            vm.getTotalBitcoinAmmount = function(){
                 var totalBitcoinAmmount = 0;
-                for(var wallet in this.wallets){
+                for(var wallet in vm.wallets){
                     totalBitcoinAmmount += wallet.balance;
                 }
                 return totalBitcoinAmmount;
             };
 
+            vm.test = "tesst";
+            vm.ammountToSend = 0;
+            vm.btcPrice = 1240;
 
-
-            this.test = "tesst";
-            this.ammountToSend = 0;
-            this.btcPrice = 1240;
-
-            this.selectedWallet = {
+            vm.selectedWallet = {
                 "id": 0,
                 "balance": "0",
                 "name": "",
                 "address": "Please select your wallet"
             };
 
-            this.isRemoveSignVisible = false;
+            vm.isRemoveSignVisible = false;
 
-            this.showRemoveSign = function () {
-                this.isRemoveSignVisible = true;
+            vm.showRemoveSign = function () {
+                vm.isRemoveSignVisible = true;
             };
 
-            this.hideRemoveSign = function () {
-                this.isRemoveSignVisible = false;
+            vm.hideRemoveSign = function () {
+                vm.isRemoveSignVisible = false;
             };
 
-
-            this.deleteWallet = function (wallet) {
-                var index = this.wallets.indexOf(wallet);
-                this.wallets.splice(index);
+            vm.deleteWallet = function (wallet) {
+                var index = vm.wallets.indexOf(wallet);
+                vm.wallets.splice(index);
             }
-            //
-            // this.toggleRemoveSign = function() {
-            //     this.isRemoveSignVisible = this.isRemoveSignVisible === false ? true: false;
-            // };
+
+            vm.createNewWallet = function () {
 
 
-            // this.togglePersonalMenu = function() {
-            //     document.getElementById("myDropdown").classList.toggle("show");
-            // }
-
-
-            this.createNewWallet = function () {
-                var newWallet = {
-                    "id": "",
-                    "name": "New wallet",
-                    "balance": 0,
-                    "address": "1EdVuraZCVhS2zi7eAevVtpHvPQtHtWdAR"
-                };
-                this.wallets.push(newWallet);
+                // var newWallet = {
+                //     "id": "",
+                //     "name": "New wallet",
+                //     "balance": 0,
+                //     "address": "1EdVuraZCVhS2zi7eAevVtpHvPQtHtWdAR"
+                // };
+                // vm.wallets.push(newWallet);
             }
         }
     ]
-});
 
+});

@@ -1,0 +1,31 @@
+.center-modal {
+    position: fixed;
+    top: 20%;
+    left: 10%;
+    z-index: 1050;
+    width: 80%;
+    height: 80%;
+}
+
+.create-wallet-modal-header{
+    color: #626263;
+    background-color: #fafafa;
+}
+
+.modal-body{
+    background-color: #fafafa;
+}
+
+.modal-footer{
+    background-color: #fafafa;
+}
+
+.close-modal-icon{
+    position:absolute;
+    right:0;
+    color: gray;
+}
+
+.close-modal-icon:hover{
+    color: #f08e43;
+}

@@ -29,7 +29,7 @@
                                 <h4 class="wallet-balance">{{wallet.balance}} BTC </h4>
                                 <span ng-if="walletListCtrl.isRemoveSignVisible" ng-click="walletListCtrl.deleteWallet(wallet)" style="position: absolute; right: 15px; top: 30px;"
                                       class="glyphicon glyphicon-remove remove-wallet">
-                                        </span>
+                                </span>
 
                                 <!--<img ng-src="{{wallet.imageUrl}}" alt="{{phone.name}}" />-->
                             </div>
@@ -37,13 +37,13 @@
                         </div>
                     </div>
                     <div class="col-md-12 wallets-footer">
-                        <div ng-click="walletListCtrl.createNewWallet()" class="btn btn-success btn-lg"><span
-                                class="glyphicon glyphicon-plus-sign"></span> Create new wallet
+                        <div ng-click="walletListCtrl.modal()" class="btn btn-success">
+                            <span class="glyphicon glyphicon-plus-sign"></span> Create new wallet
                         </div>
                     </div>
                 </div>
 
-                <!-- WALLET PANEL START-->
+            <!-- WALLET PANEL START-->
                 <div class="col-md-9 subsection wallet-panel">
                     <h3 class="subsection-head">{{walletListCtrl.selectedWallet.name}}</h3>
                     <div class="subsection-body">
