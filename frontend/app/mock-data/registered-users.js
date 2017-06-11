@@ -1,0 +1,5 @@
+[
+    {
+        "email" : "email@dsfcom.pl"
+    }
+]
