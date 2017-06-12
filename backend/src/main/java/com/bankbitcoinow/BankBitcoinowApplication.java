@@ -10,10 +10,19 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @SpringBootApplication
 public class BankBitcoinowApplication {
@@ -43,6 +52,8 @@ public class BankBitcoinowApplication {
 					.formLogin()
 						.loginPage("/login")
 						.permitAll()
+						.successHandler(successHandler())
+						.failureHandler(failureHandler())
 						.and()
 					.logout()
 						.permitAll();
@@ -53,6 +64,25 @@ public class BankBitcoinowApplication {
 		public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
 			auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder());
 			//auth.inMemoryAuthentication().withUser("JAJA").password("dddd").roles("ADMIN");
+		}
+		private AuthenticationSuccessHandler successHandler() {
+			return new AuthenticationSuccessHandler() {
+				@Override
+				public void onAuthenticationSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) throws IOException, ServletException {
+					httpServletResponse.getWriter().append("OK");
+					httpServletResponse.setStatus(200);
+				}
+			};
+		}
+
+		private AuthenticationFailureHandler failureHandler() {
+			return new AuthenticationFailureHandler() {
+				@Override
+				public void onAuthenticationFailure(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException, ServletException {
+					httpServletResponse.getWriter().append("Authentication failure");
+					httpServletResponse.setStatus(401);
+				}
+			};
 		}
 	}
 
