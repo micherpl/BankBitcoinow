@@ -63,7 +63,7 @@ public class UserController {
 
         userService.save(user);
 
-        //securityService.autologin(registrationForm.getUsername(), registrationForm.getPassword());
+        securityService.autologin(registrationForm.getEmail(), registrationForm.getPassword());
 
         return user;
     }
