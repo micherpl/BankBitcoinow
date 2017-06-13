@@ -20,6 +20,7 @@ import com.bankbitcoinow.services.TransactionService;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -122,9 +123,8 @@ public class TransactionController {
         bitcoinjFacade.broadcastTransaction(sendRequest);
     }
 
-    @RequestMapping(method = RequestMethod.GET, value="/wyswietl_wszystkie_transkacje")
-    public void getAllTransaction(@RequestBody Transaction transaction) {
-        transactionService.getAllTransactions();
-
+    @RequestMapping(method = RequestMethod.GET, value="/wyswietl_wszystkie_transkacje/{idAdresuKontaBitcoin}")
+    public List<Transaction> getAllTransaction(@PathVariable Long idAdresuKontaBitcoin) {
+        return transactionService.getTransactionsFromAdress(idAdresuKontaBitcoin);
     }
 }

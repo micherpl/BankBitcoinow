@@ -8,6 +8,7 @@ import com.bankbitcoinow.repository.TransactionRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TransactionService {
@@ -40,4 +41,8 @@ public class TransactionService {
         return  transactions;
     }
 
+    public List<Transaction> getTransactionsFromAdress(Long idAdresuKontaBitcoin)
+    {
+        return transactionRepository.findByAddressId(idAdresuKontaBitcoin);
+    }
 }
