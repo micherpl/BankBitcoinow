@@ -167,25 +167,22 @@ public class TransactionUpdater implements CommandLineRunner, TransactionConfide
 		}
 	}
 
-	private void updateExistingTransaction(Transaction tx, com.bankbitcoinow.models.Transaction transaction) {
+	void updateExistingTransaction(Transaction tx, com.bankbitcoinow.models.Transaction transaction) {
 		LOG.debug("Found existing transaction in database");
 
 		TransactionConfidence confidence = tx.getConfidence();
 		TransactionStatus currentStatus = transaction.getStatus();
-		TransactionStatus newStatus = getNewStatus(currentStatus, confidence);
+		int currentConfirmations = transaction.getConfirmations();
+		updateStatus(transaction, confidence);
+		updateConfirmations(transaction, confidence);
 
-		if (newStatus != currentStatus) {
-			LOG.info("Changing status of transaction {} from {} to {}",
-					transaction.getId(), currentStatus, newStatus);
-			transaction.setStatus(newStatus);
-
-			updateConfirmations(transaction, confidence);
-
+		if (transaction.getStatus() != currentStatus
+				|| transaction.getConfirmations() != currentConfirmations) {
 			transactionService.updateTransction(transaction);
 		}
 	}
 
-	private void addNewTransaction(Transaction tx, Coin value, boolean incoming, String addressStr) {
+	void addNewTransaction(Transaction tx, Coin value, boolean incoming, String addressStr) {
 		com.bankbitcoinow.models.Address dbAddress = addressService.findByAddress(addressStr);
 
 		if (dbAddress == null) {
@@ -215,7 +212,19 @@ public class TransactionUpdater implements CommandLineRunner, TransactionConfide
 		transactionService.addTransaction(transaction);
 	}
 
-	private static TransactionStatus getNewStatus(TransactionStatus currentStatus,
+	private void updateStatus(com.bankbitcoinow.models.Transaction transaction,
+	                          TransactionConfidence confidence) {
+		TransactionStatus currentStatus = transaction.getStatus();
+		TransactionStatus newStatus = getNewStatus(currentStatus, confidence);
+
+		if (newStatus != currentStatus) {
+			LOG.info("Changing status of transaction {} from {} to {}",
+					transaction.getId(), currentStatus, newStatus);
+			transaction.setStatus(newStatus);
+		}
+	}
+
+	static TransactionStatus getNewStatus(TransactionStatus currentStatus,
 	                                              TransactionConfidence confidence) {
 		switch (confidence.getConfidenceType()) {
 			case PENDING:
@@ -227,13 +236,20 @@ public class TransactionUpdater implements CommandLineRunner, TransactionConfide
 		}
 	}
 
-	private void updateConfirmations(com.bankbitcoinow.models.Transaction transaction,
+	void updateConfirmations(com.bankbitcoinow.models.Transaction transaction,
 	                                 TransactionConfidence confidence) {
 		if (transaction.getStatus() == TransactionStatus.CONFIRMED
 				&& confidence.getConfidenceType() == ConfidenceType.BUILDING) {
 			int lastBlockSeenHeight = wallet.getLastBlockSeenHeight();
 			int appearedAtChainHeight = confidence.getAppearedAtChainHeight();
-			transaction.setConfirmations(lastBlockSeenHeight - appearedAtChainHeight);
+			int currentConfirmations = transaction.getConfirmations();
+			int newConfirmations = lastBlockSeenHeight - appearedAtChainHeight;
+
+			if (newConfirmations != currentConfirmations) {
+				LOG.info("Changing number of confirmations of transaction {} from {} to {}",
+						transaction.getId(), currentConfirmations, newConfirmations);
+				transaction.setConfirmations(newConfirmations);
+			}
 		}
 	}
 }

@@ -7,7 +7,10 @@ import com.bankbitcoinow.services.TransactionService;
 import org.bitcoinj.core.AbstractBlockChain;
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Coin;
+import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Transaction;
+import org.bitcoinj.core.TransactionConfidence;
+import org.bitcoinj.core.TransactionConfidence.ConfidenceType;
 import org.bitcoinj.core.TransactionOutput;
 import org.bitcoinj.wallet.Wallet;
 import org.junit.Before;
@@ -112,4 +115,168 @@ public class TransactionUpdaterTest {
 		verifyNoMoreInteractions(transactionService);
 	}
 
+	@Test
+	public void testUpdateExistingTransactionWithChangedStatus() throws Exception {
+		// Given
+		Transaction tx = mock(Transaction.class);
+		when(tx.getConfidence()).thenAnswer(invocation -> {
+			TransactionConfidence confidence = new TransactionConfidence(Sha256Hash.ZERO_HASH);
+			confidence.setConfidenceType(ConfidenceType.PENDING);
+			return confidence;
+		});
+
+		com.bankbitcoinow.models.Transaction dbTransaction = new com.bankbitcoinow.models.Transaction();
+		dbTransaction.setId(123L);
+		dbTransaction.setStatus(TransactionStatus.SIGNED);
+
+		// When
+		transactionUpdater.updateExistingTransaction(tx, dbTransaction);
+
+		// Then
+		verify(transactionService, times(1)).updateTransction(transactionCaptor.capture());
+		com.bankbitcoinow.models.Transaction updatedTransaction = transactionCaptor.getValue();
+		assertEquals(Long.valueOf(123), updatedTransaction.getId());
+		assertEquals(TransactionStatus.UNCONFIRMED, updatedTransaction.getStatus());
+		assertEquals(0, updatedTransaction.getConfirmations());
+	}
+
+	@Test
+	public void testUpdateExistingTransactionWithChangedConfirmations() throws Exception {
+		// Given
+		Transaction tx = mock(Transaction.class);
+		when(tx.getConfidence()).thenAnswer(invocation -> {
+			TransactionConfidence confidence = new TransactionConfidence(Sha256Hash.ZERO_HASH);
+			confidence.setConfidenceType(ConfidenceType.BUILDING);
+			confidence.setAppearedAtChainHeight(1000);
+			return confidence;
+		});
+
+		when(wallet.getLastBlockSeenHeight()).thenReturn(1201);
+
+		com.bankbitcoinow.models.Transaction dbTransaction = new com.bankbitcoinow.models.Transaction();
+		dbTransaction.setId(123L);
+		dbTransaction.setStatus(TransactionStatus.CONFIRMED);
+		dbTransaction.setConfirmations(200);
+
+		// When
+		transactionUpdater.updateExistingTransaction(tx, dbTransaction);
+
+		// Then
+		verify(transactionService, times(1)).updateTransction(transactionCaptor.capture());
+		com.bankbitcoinow.models.Transaction updatedTransaction = transactionCaptor.getValue();
+		assertEquals(Long.valueOf(123), updatedTransaction.getId());
+		assertEquals(TransactionStatus.CONFIRMED, updatedTransaction.getStatus());
+		assertEquals(201, updatedTransaction.getConfirmations());
+	}
+
+	@Test
+	public void testAddNewTransactionForNonExistingAddress() throws Exception {
+		String addressStr = "mtHPuhhhXpyAk5FTG7mMa8K7ntUHARzXXn";
+		when(addressService.findByAddress(addressStr)).thenReturn(null);
+
+		transactionUpdater.addNewTransaction(new Transaction(TestUtils.PARAMS), Coin.COIN, false, addressStr);
+
+		verifyZeroInteractions(transactionService);
+	}
+
+	@Test
+	public void testAddNewTransaction() throws Exception {
+		// Given
+		String addressStr = "mtHPuhhhXpyAk5FTG7mMa8K7ntUHARzXXn";
+		com.bankbitcoinow.models.Address dbAddress = new com.bankbitcoinow.models.Address();
+		dbAddress.setAddress(addressStr);
+		when(addressService.findByAddress(addressStr)).thenReturn(dbAddress);
+
+		Transaction tx = mock(Transaction.class);
+
+		String txHash = "some hash";
+		when(tx.getHashAsString()).thenReturn(txHash);
+
+		byte[] txData = {0x11, 0x22, 0x33};
+		when(tx.unsafeBitcoinSerialize()).thenReturn(txData);
+
+		when(tx.getConfidence()).thenAnswer(invocation -> {
+			TransactionConfidence confidence = new TransactionConfidence(Sha256Hash.ZERO_HASH);
+			confidence.setConfidenceType(ConfidenceType.BUILDING);
+			confidence.setAppearedAtChainHeight(100);
+			return confidence;
+		});
+
+		when(wallet.getLastBlockSeenHeight()).thenReturn(333);
+
+		// When
+		transactionUpdater.addNewTransaction(tx, Coin.COIN, false, addressStr);
+
+		// Then
+		verify(transactionService, times(1)).addTransaction(transactionCaptor.capture());
+		com.bankbitcoinow.models.Transaction dbTransaction = transactionCaptor.getValue();
+		assertEquals(txHash, dbTransaction.getHash());
+		assertEquals(dbAddress.getAddress(), dbTransaction.getSourceAddress());
+		assertNull(dbTransaction.getDestinationAddress());
+		assertEquals(new BigDecimal("1.00000000"), dbTransaction.getAmount());
+		assertEquals(TransactionStatus.CONFIRMED, dbTransaction.getStatus());
+		assertEquals(233, dbTransaction.getConfirmations());
+		assertArrayEquals(txData, dbTransaction.getBlockchainData());
+		assertSame(dbAddress, dbTransaction.getAddress());
+	}
+
+	@Test
+	public void testGetNewStatusNullUnknown() throws Exception {
+		testStatus(null, ConfidenceType.UNKNOWN, null);
+	}
+
+	@Test
+	public void testGetNewStatusPreparedUnknown() throws Exception {
+		testStatus(TransactionStatus.PREPARED, ConfidenceType.UNKNOWN, TransactionStatus.PREPARED);
+	}
+
+	@Test
+	public void testGetNewStatusSignedPending() throws Exception {
+		testStatus(TransactionStatus.SIGNED, ConfidenceType.PENDING, TransactionStatus.UNCONFIRMED);
+	}
+
+	@Test
+	public void testGetNewStatusUnconfirmedPending() throws Exception {
+		testStatus(TransactionStatus.UNCONFIRMED, ConfidenceType.PENDING, TransactionStatus.UNCONFIRMED);
+	}
+
+	@Test
+	public void testGetNewStatusUnconfirmedBuilding() throws Exception {
+		testStatus(TransactionStatus.UNCONFIRMED, ConfidenceType.BUILDING, TransactionStatus.CONFIRMED);
+	}
+
+	@Test
+	public void testGetNewStatusConfirmedBuilding() throws Exception {
+		testStatus(TransactionStatus.CONFIRMED, ConfidenceType.BUILDING, TransactionStatus.CONFIRMED);
+	}
+
+	private void testStatus(TransactionStatus currentStatus,
+	                        ConfidenceType confidenceType,
+	                        TransactionStatus expectedStatus) {
+		TransactionConfidence confidence = new TransactionConfidence(Sha256Hash.ZERO_HASH);
+		confidence.setConfidenceType(confidenceType);
+
+		TransactionStatus newStatus = TransactionUpdater.getNewStatus(currentStatus, confidence);
+
+		assertEquals(expectedStatus, newStatus);
+	}
+
+	@Test
+	public void testUpdateConfirmations() throws Exception {
+		// Given
+		com.bankbitcoinow.models.Transaction transaction = mock(com.bankbitcoinow.models.Transaction.class);
+		when(transaction.getStatus()).thenReturn(TransactionStatus.CONFIRMED);
+
+		TransactionConfidence confidence = new TransactionConfidence(Sha256Hash.ZERO_HASH);
+		confidence.setConfidenceType(ConfidenceType.BUILDING);
+		confidence.setAppearedAtChainHeight(123);
+
+		when(wallet.getLastBlockSeenHeight()).thenReturn(234);
+
+		// When
+		transactionUpdater.updateConfirmations(transaction, confidence);
+
+		// Then
+		verify(transaction, times(1)).setConfirmations(111);
+	}
 }
