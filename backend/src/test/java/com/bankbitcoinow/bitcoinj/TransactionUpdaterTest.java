@@ -4,7 +4,6 @@ import com.bankbitcoinow.MockUtils;
 import com.bankbitcoinow.models.TransactionStatus;
 import com.bankbitcoinow.services.AddressService;
 import com.bankbitcoinow.services.TransactionService;
-import org.bitcoinj.core.AbstractBlockChain;
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.Sha256Hash;
@@ -32,7 +31,6 @@ import static org.mockito.Mockito.*;
 public class TransactionUpdaterTest {
 
 	@Mock private Wallet wallet;
-	@Mock private AbstractBlockChain blockChain;
 	@Mock private AddressService addressService;
 	@Mock private TransactionService transactionService;
 	@Captor private ArgumentCaptor<com.bankbitcoinow.models.Transaction> transactionCaptor;
@@ -41,7 +39,7 @@ public class TransactionUpdaterTest {
 
 	@Before
 	public void setUp() throws Exception {
-		transactionUpdater = new TransactionUpdater(wallet, blockChain, addressService, transactionService);
+		transactionUpdater = new TransactionUpdater(wallet, addressService, transactionService);
 	}
 
 	@Test
@@ -68,7 +66,7 @@ public class TransactionUpdaterTest {
 		transactionUpdater.onTransactionConfidenceChanged(wallet, tx);
 
 		// Then
-		MockUtils.printInvocationsInOrder(transactionOutputSpy, wallet, blockChain, addressService, transactionService);
+		MockUtils.printInvocationsInOrder(transactionOutputSpy, wallet, addressService, transactionService);
 		verify(transactionService, times(1)).addTransaction(transactionCaptor.capture());
 
 		com.bankbitcoinow.models.Transaction dbTransaction = transactionCaptor.getValue();
@@ -110,7 +108,7 @@ public class TransactionUpdaterTest {
 		transactionUpdater.onTransactionConfidenceChanged(wallet, tx);
 
 		// Then
-		MockUtils.printInvocationsInOrder(transactionOutputSpy, wallet, blockChain, addressService, transactionService);
+		MockUtils.printInvocationsInOrder(transactionOutputSpy, wallet, addressService, transactionService);
 		verify(transactionService, times(1)).find(dbTransaction.getHash(), dbAddress.getAddress());
 		verifyNoMoreInteractions(transactionService);
 	}

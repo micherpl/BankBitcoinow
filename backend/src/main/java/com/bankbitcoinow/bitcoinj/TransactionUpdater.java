@@ -1,20 +1,15 @@
 package com.bankbitcoinow.bitcoinj;
 
 import com.bankbitcoinow.models.TransactionStatus;
-import org.bitcoinj.core.AbstractBlockChain;
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.ECKey;
-import org.bitcoinj.core.Sha256Hash;
-import org.bitcoinj.core.StoredBlock;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionConfidence;
 import org.bitcoinj.core.TransactionConfidence.ConfidenceType;
 import org.bitcoinj.core.TransactionInput;
 import org.bitcoinj.core.TransactionOutput;
-import org.bitcoinj.core.VerificationException;
 import org.bitcoinj.core.listeners.TransactionConfidenceEventListener;
-import org.bitcoinj.core.listeners.TransactionReceivedInBlockListener;
 import org.bitcoinj.script.Script;
 import org.bitcoinj.wallet.RedeemData;
 import org.bitcoinj.wallet.Wallet;
@@ -36,17 +31,14 @@ public class TransactionUpdater implements CommandLineRunner, TransactionConfide
 	private static final Logger LOG = LoggerFactory.getLogger(TransactionUpdater.class);
 
 	private final Wallet wallet;
-	private final AbstractBlockChain blockChain;
 	private final AddressService addressService;
 	private final TransactionService transactionService;
 
 	@Autowired
 	public TransactionUpdater(Wallet wallet,
-	                          AbstractBlockChain blockChain,
 	                          AddressService addressService,
 	                          TransactionService transactionService) {
 		this.wallet = wallet;
-		this.blockChain = blockChain;
 		this.addressService = addressService;
 		this.transactionService = transactionService;
 	}
@@ -59,27 +51,7 @@ public class TransactionUpdater implements CommandLineRunner, TransactionConfide
 
 	private void registerWalletListeners() {
 		LOG.info("Registering wallet listeners...");
-
-		wallet.addChangeEventListener(w -> LOG.debug("Wallet changed"));
-		wallet.addCoinsReceivedEventListener((w, tx, prevBalance, newBalance) -> LOG.debug("Coins received in transaction {}. Prev: {}. New: {}", tx, prevBalance, newBalance));
-		wallet.addCoinsSentEventListener((w, tx, prevBalance, newBalance) -> LOG.debug("Coins sent in transaction {}. Prev: {}. New: {}", tx, prevBalance, newBalance));
-		wallet.addTransactionConfidenceEventListener((w, tx) -> LOG.debug("Transaction confidence chanced for: {}. Value: {}", tx, tx.getConfidence()));
 		wallet.addTransactionConfidenceEventListener(this);
-
-		blockChain.addTransactionReceivedListener(new TransactionReceivedInBlockListener() {
-			@Override
-			public void receiveFromBlock(Transaction tx, StoredBlock block, AbstractBlockChain.NewBlockType blockType, int relativityOffset) throws VerificationException {
-				LOG.debug("Received transaction from block: {}", tx);
-				LOG.debug("Relative offset: {}", relativityOffset);
-				LOG.debug("Wallet: {}", wallet);
-			}
-
-			@Override
-			public boolean notifyTransactionIsInBlock(Sha256Hash txHash, StoredBlock block, AbstractBlockChain.NewBlockType blockType, int relativityOffset) throws VerificationException {
-				return false;
-			}
-		});
-
 		LOG.info("Wallet listeners registered");
 	}
 
