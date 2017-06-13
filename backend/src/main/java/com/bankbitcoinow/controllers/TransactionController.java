@@ -43,12 +43,6 @@ public class TransactionController {
 
     private final ConcurrentMap<Long, SendRequest> preparedSendRequests = new ConcurrentHashMap<>();
 
-    @RequestMapping(method = RequestMethod.POST, value="/nowy_przelew")
-    public void doTransaction(@RequestBody Transaction transaction) {
-        transactionService.addTransaction(transaction);
-
-    }
-
     @RequestMapping(method = RequestMethod.POST, value="/przygotuj_przelew")
     public Map<String, Object> prepareTransaction(@RequestBody Map<String, String> input) throws InsufficientMoneyException {
         String from = input.get("from");
