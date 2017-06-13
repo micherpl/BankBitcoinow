@@ -35,7 +35,6 @@ angular.module('startPage').component('startPage', {
         //
         // authenticate();
 
-        vm.credentials = {};
         // vm.loginRequest = function() {
         //     authenticate(vm.credentials, function(authenticated) {
         //         if (authenticated) {
@@ -53,11 +52,33 @@ angular.module('startPage').component('startPage', {
         // };
 
 
-        vm.tempLoginRequest = function() {
+
+        vm.credentials = {};
+
+
+        vm.loginRequest = function() {
+
+            var url = window.location.protocol+"//"+window.location.hostname+":8080/login";
+
+            alert(url);
+            $http({
+                method: 'POST',
+                url: url,
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                data: 'username='+encodeURIComponent(vm.credentials.email)+'&password='+encodeURIComponent(vm.credentials.password)}
+            ).success(function(response){
+                alert(111);
+                alert(response);
+            }).error(function(response){
+                alert(222);
+            });
+
             $rootScope.loggedInUser = vm.credentials;
             vm.error = false;
             $location.path("/wallets");
         };
+
+
 
         $rootScope.logout = function() {
             $http.post(window.location.protocol+'//'+window.location.hostname+':8080/logout', {}).finally(function() {
