@@ -1,0 +1,1 @@
+ALTER TABLE address ALTER COLUMN balance TYPE DECIMAL;
