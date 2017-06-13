@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class SecurityServiceImpl implements SecurityService{
-//    @Autowired
+     @Autowired
     private AuthenticationManager authenticationManager;
 
     @Autowired
