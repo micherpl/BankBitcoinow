@@ -1,0 +1,45 @@
+<div class="container-fluid">
+
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2 main-section" style="color: whitesmoke; padding-top: 150px;">
+
+            <h1 style="letter-spacing: 0.2em; font-family: sourceSansPro-ExtraLight; margin-bottom: 30px;">REGISTER NEW ACCOUNT</h1>
+            <div class="col-md-4 col-md-offset-4">
+                <form name="form" ng-submit="registrationCtrl.register()" role="form">
+                    <!--<div class="form-group" ng-class="{ 'has-error': form.firstName.$dirty && form.firstName.$error.required }">-->
+                    <!--<h4>First name</h4>-->
+                    <!--<input style="border-radius: 2px;" class="form-control input-lg text-center" type="text" name="firstName" id="firstName" class="form-control" ng-model="registrationCtrl.user.firstName" required />-->
+                    <!--<span ng-show="form.firstName.$dirty && form.firstName.$error.required" class="help-block">First name is required</span>-->
+                    <!--</div>-->
+                    <!--<div class="form-group" ng-class="{ 'has-error': form.lastName.$dirty && form.lastName.$error.required }">-->
+                    <!--<h4>Last name</h4>-->
+                    <!--<input style="border-radius: 2px;" class="form-control input-lg text-center" type="text" name="lastName" id="lastName" class="form-control" ng-model="registrationCtrl.user.lastName" required />-->
+                    <!--<span ng-show="form.lastName.$dirty && form.lastName.$error.required" class="help-block">Last name is required</span>-->
+                    <!--</div>-->
+                    <div class="form-group" ng-class="{ 'has-error': form.email.$dirty && (form.email.$invalid || registrationCtrl.serverErrors.email)}">
+                        <h4>E-mail address</h4>
+                        <input style="border-radius: 2px;" class="form-control input-lg text-center" type="text" name="email" id="email" class="form-control" ng-model="registrationCtrl.email" required />
+                        <span ng-show="form.email.$dirty && form.email.$error.required" class="help-block">E-mail address is required</span>
+                        <span ng-show="registrationCtrl.serverErrors.email" class="help-block">{{registrationCtrl.serverErrors.email}}</span>
+                    </div>
+                    <div class="form-group" ng-class="{ 'has-error': form.password.$dirty && (form.password.$invalid || registrationCtrl.serverErrors.password)}">
+                        <h4>Password</h4>
+                        <input style="border-radius: 2px;" class="form-control input-lg text-center" type="password" name="password" id="password" class="form-control" ng-model="registrationCtrl.password" required />
+                        <span ng-show="form.password.$dirty && form.password.$error.required" class="help-block">Password is required</span>
+                        <span ng-show="registrationCtrl.serverErrors.password" class="help-block">{{registrationCtrl.serverErrors.password}}</span>
+                    </div>
+                    <div class="form-actions">
+                        <button ng-disabled="form.$invalid" style="margin-top: 30px; border-radius: 50px;" type="submit" class="btn btn-lg btn-default">Register new account <span class="glyphicon glyphicon-circle-arrow-right"></span></button>
+                        <h1></h1>
+
+                        <a href="#!/start">
+                            <div class="btn btn-link">Already registered?</div>
+                        </a>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+</div>
