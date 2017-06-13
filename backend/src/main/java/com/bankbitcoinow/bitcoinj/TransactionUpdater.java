@@ -148,9 +148,22 @@ public class TransactionUpdater implements CommandLineRunner, TransactionConfide
 		updateStatus(transaction, confidence);
 		updateConfirmations(transaction, confidence);
 
-		if (transaction.getStatus() != currentStatus
-				|| transaction.getConfirmations() != currentConfirmations) {
+		boolean statusChanged = transaction.getStatus() != currentStatus;
+		boolean confirmationsChanged = transaction.getConfirmations() != currentConfirmations;
+		if (statusChanged || confirmationsChanged) {
 			transactionService.updateTransction(transaction);
+		}
+
+		if (statusChanged && transaction.getStatus() == TransactionStatus.CONFIRMED) {
+			com.bankbitcoinow.models.Address address = transaction.getAddress();
+
+			if (transaction.isIncoming()) {
+				address.addAmount(transaction.getAmount());
+			} else {
+				address.takeAmount(transaction.getAmount());
+			}
+
+			addressService.updateAddress(address);
 		}
 	}
 

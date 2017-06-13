@@ -151,10 +151,16 @@ public class TransactionUpdaterTest {
 
 		when(wallet.getLastBlockSeenHeight()).thenReturn(1201);
 
+		com.bankbitcoinow.models.Address dbAddress = new com.bankbitcoinow.models.Address();
+		dbAddress.setId(1L);
+		dbAddress.setBalance(new BigDecimal("10.00000000"));
+
 		com.bankbitcoinow.models.Transaction dbTransaction = new com.bankbitcoinow.models.Transaction();
 		dbTransaction.setId(123L);
 		dbTransaction.setStatus(TransactionStatus.CONFIRMED);
 		dbTransaction.setConfirmations(200);
+		dbTransaction.setAmount(new BigDecimal("1"));
+		dbTransaction.setAddress(dbAddress);
 
 		// When
 		transactionUpdater.updateExistingTransaction(tx, dbTransaction);
@@ -165,6 +171,81 @@ public class TransactionUpdaterTest {
 		assertEquals(Long.valueOf(123), updatedTransaction.getId());
 		assertEquals(TransactionStatus.CONFIRMED, updatedTransaction.getStatus());
 		assertEquals(201, updatedTransaction.getConfirmations());
+		verifyZeroInteractions(addressService);
+	}
+
+	@Test
+	public void testUpdateAddressBalanceWhenIncomingTransactionIsConfirmed() throws Exception {
+		// Given
+		Transaction tx = mock(Transaction.class);
+		when(tx.getConfidence()).thenAnswer(invocation -> {
+			TransactionConfidence confidence = new TransactionConfidence(Sha256Hash.ZERO_HASH);
+			confidence.setConfidenceType(ConfidenceType.BUILDING);
+			confidence.setAppearedAtChainHeight(1000);
+			return confidence;
+		});
+
+		when(wallet.getLastBlockSeenHeight()).thenReturn(1201);
+
+		com.bankbitcoinow.models.Address dbAddress = new com.bankbitcoinow.models.Address();
+		dbAddress.setId(1L);
+		dbAddress.setAddress("mtHPuhhhXpyAk5FTG7mMa8K7ntUHARzXXn");
+		dbAddress.setBalance(new BigDecimal("10.00000000"));
+
+		com.bankbitcoinow.models.Transaction dbTransaction = new com.bankbitcoinow.models.Transaction();
+		dbTransaction.setId(123L);
+		dbTransaction.setStatus(TransactionStatus.UNCONFIRMED);
+		dbTransaction.setConfirmations(0);
+		dbTransaction.setAmount(new BigDecimal("1.50000000"));
+		dbTransaction.setAddress(dbAddress);
+		dbTransaction.setDestinationAddress(dbAddress.getAddress());
+
+		// When
+		transactionUpdater.updateExistingTransaction(tx, dbTransaction);
+
+		// Then
+		ArgumentCaptor<com.bankbitcoinow.models.Address> addressCaptor = ArgumentCaptor.forClass(com.bankbitcoinow.models.Address.class);
+		verify(addressService, times(1)).updateAddress(addressCaptor.capture());
+		com.bankbitcoinow.models.Address updatedAddress = addressCaptor.getValue();
+		assertEquals(Long.valueOf(1), updatedAddress.getId());
+		assertEquals(new BigDecimal("11.50000000"), updatedAddress.getBalance());
+	}
+
+	@Test
+	public void testUpdateAddressBalanceWhenOutcomingTransactionIsConfirmed() throws Exception {
+		// Given
+		Transaction tx = mock(Transaction.class);
+		when(tx.getConfidence()).thenAnswer(invocation -> {
+			TransactionConfidence confidence = new TransactionConfidence(Sha256Hash.ZERO_HASH);
+			confidence.setConfidenceType(ConfidenceType.BUILDING);
+			confidence.setAppearedAtChainHeight(1000);
+			return confidence;
+		});
+
+		when(wallet.getLastBlockSeenHeight()).thenReturn(1201);
+
+		com.bankbitcoinow.models.Address dbAddress = new com.bankbitcoinow.models.Address();
+		dbAddress.setId(1L);
+		dbAddress.setAddress("mtHPuhhhXpyAk5FTG7mMa8K7ntUHARzXXn");
+		dbAddress.setBalance(new BigDecimal("10.00000000"));
+
+		com.bankbitcoinow.models.Transaction dbTransaction = new com.bankbitcoinow.models.Transaction();
+		dbTransaction.setId(123L);
+		dbTransaction.setStatus(TransactionStatus.UNCONFIRMED);
+		dbTransaction.setConfirmations(0);
+		dbTransaction.setAmount(new BigDecimal("1.50000000"));
+		dbTransaction.setAddress(dbAddress);
+		dbTransaction.setSourceAddress(dbAddress.getAddress());
+
+		// When
+		transactionUpdater.updateExistingTransaction(tx, dbTransaction);
+
+		// Then
+		ArgumentCaptor<com.bankbitcoinow.models.Address> addressCaptor = ArgumentCaptor.forClass(com.bankbitcoinow.models.Address.class);
+		verify(addressService, times(1)).updateAddress(addressCaptor.capture());
+		com.bankbitcoinow.models.Address updatedAddress = addressCaptor.getValue();
+		assertEquals(Long.valueOf(1), updatedAddress.getId());
+		assertEquals(new BigDecimal("8.50000000"), updatedAddress.getBalance());
 	}
 
 	@Test

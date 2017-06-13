@@ -11,7 +11,7 @@ public class Address {
     private Long id;
     private String address;
     private byte[] privateKey;
-    private BigDecimal balance;
+    private BigDecimal balance = BigDecimal.ZERO;
     private Timestamp created_at;
 
     private User user;
@@ -52,6 +52,16 @@ public class Address {
 
     public void setBalance(BigDecimal balance) {
         this.balance = balance;
+    }
+
+    @Transient
+    public void addAmount(BigDecimal amount) {
+        this.balance = this.balance.add(amount);
+    }
+
+    @Transient
+    public void takeAmount(BigDecimal amount) {
+        this.balance = this.balance.subtract(amount);
     }
 
     public Timestamp getCreated_at() {

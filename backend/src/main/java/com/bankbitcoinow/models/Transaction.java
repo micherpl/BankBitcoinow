@@ -120,4 +120,14 @@ public class Transaction {
     public void setAddress(Address address) {
         this.address = address;
     }
+
+    @Transient
+    public boolean isIncoming() {
+        return address != null && address.getAddress().equals(destinationAddress);
+    }
+
+    @Transient
+    public boolean isOutgoing() {
+        return address != null && address.getAddress().equals(sourceAddress);
+    }
 }
