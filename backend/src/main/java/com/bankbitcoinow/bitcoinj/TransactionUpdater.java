@@ -228,7 +228,7 @@ public class TransactionUpdater implements CommandLineRunner, TransactionConfide
 			int lastBlockSeenHeight = wallet.getLastBlockSeenHeight();
 			int appearedAtChainHeight = confidence.getAppearedAtChainHeight();
 			int currentConfirmations = transaction.getConfirmations();
-			int newConfirmations = lastBlockSeenHeight - appearedAtChainHeight;
+			int newConfirmations = lastBlockSeenHeight - appearedAtChainHeight + 1;
 
 			if (newConfirmations != currentConfirmations) {
 				LOG.info("Changing number of confirmations of transaction {} from {} to {}",

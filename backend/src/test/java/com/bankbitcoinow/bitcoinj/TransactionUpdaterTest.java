@@ -170,7 +170,7 @@ public class TransactionUpdaterTest {
 		com.bankbitcoinow.models.Transaction updatedTransaction = transactionCaptor.getValue();
 		assertEquals(Long.valueOf(123), updatedTransaction.getId());
 		assertEquals(TransactionStatus.CONFIRMED, updatedTransaction.getStatus());
-		assertEquals(201, updatedTransaction.getConfirmations());
+		assertEquals(202, updatedTransaction.getConfirmations());
 		verifyZeroInteractions(addressService);
 	}
 
@@ -294,7 +294,7 @@ public class TransactionUpdaterTest {
 		assertNull(dbTransaction.getDestinationAddress());
 		assertEquals(new BigDecimal("1.00000000"), dbTransaction.getAmount());
 		assertEquals(TransactionStatus.CONFIRMED, dbTransaction.getStatus());
-		assertEquals(233, dbTransaction.getConfirmations());
+		assertEquals(234, dbTransaction.getConfirmations());
 		assertArrayEquals(txData, dbTransaction.getBlockchainData());
 		assertSame(dbAddress, dbTransaction.getAddress());
 	}
@@ -348,14 +348,14 @@ public class TransactionUpdaterTest {
 
 		TransactionConfidence confidence = new TransactionConfidence(Sha256Hash.ZERO_HASH);
 		confidence.setConfidenceType(ConfidenceType.BUILDING);
-		confidence.setAppearedAtChainHeight(123);
+		confidence.setAppearedAtChainHeight(200);
 
-		when(wallet.getLastBlockSeenHeight()).thenReturn(234);
+		when(wallet.getLastBlockSeenHeight()).thenReturn(200);
 
 		// When
 		transactionUpdater.updateConfirmations(transaction, confidence);
 
 		// Then
-		verify(transaction, times(1)).setConfirmations(111);
+		verify(transaction, times(1)).setConfirmations(1);
 	}
 }
