@@ -78,7 +78,9 @@ angular.module('walletDetail').component('walletDetail', {
             this.deleteWallet = function (wallet) {
                 var index = this.wallets.indexOf(wallet);
                 this.wallets.splice(index);
-            }
+            };
+
+
             //
             // this.toggleRemoveSign = function() {
             //     this.isRemoveSignVisible = this.isRemoveSignVisible === false ? true: false;

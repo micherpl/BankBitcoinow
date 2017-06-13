@@ -29,3 +29,25 @@
 .close-modal-icon:hover{
     color: #f08e43;
 }
+
+
+.fade-element-in.ng-enter {
+    transition: 0.8s linear all;
+    opacity: 0;
+}
+
+.fade-element-in-init .fade-element-in.ng-enter {
+    opacity: 1;
+}
+
+.fade-element-in.ng-enter.ng-enter-active {
+    opacity: 1;
+}
+
+.fade-element-in.ng-leave {
+    transition: 0s linear all;
+    opacity: 1;
+}
+.fade-element-in.ng-leave.ng-leave-active {
+    opacity: 0;
+}

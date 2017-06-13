@@ -7,6 +7,8 @@ angular.module('transactionList').component('transactionList', {
         function TransactionListController(Wallet) {
 
 
+
+            var vm = this;
             // this.transactions = Transactions.query();
 
 

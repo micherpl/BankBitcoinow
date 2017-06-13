@@ -24,37 +24,42 @@
 'use strict';
 
 angular.module('walletList')
-    .controller('newWalletModalController', function($uibModalInstance, key, $http) {
-
+    .controller('newWalletModalController', function($uibModalInstance, key, $http, $rootScope) {
 
         var vm = this;
 
         vm.newWallet = {};
-
-        vm.featureName = key;
-
-
+        vm.isNewWalletCreated = false;
+        vm.isWalletCreationPending = false;
 
         vm.generateWallet = function (){
 
-            var parameter = {
-                email : "ddd@ddd.pl",
+            vm.isWalletCreationPending = true;
+
+            var data = {
+                email: "test@mail.com",
+                alias: vm.newWallet.alias,
                 password: vm.newWallet.password
             };
 
-            var url = "http://localhost:8080/generuj_adres";
+            var url = window.location.protocol+"//"+window.location.hostname+":8080/createWallet";
 
-            $http.post(url, JSON.stringify(parameter),{headers: {'Content-type' : 'application/json'}}).success(function(data){
-                alert(1);
-            }).error(function(data){
+            $http.post(url, JSON.stringify(data)).success(function(response){
+                vm.newWallet.address = response.address;
+                vm.newWallet.privateKey = response.privateKey;
+
+                vm.isNewWalletCreated = true;
+                vm.isWalletCreationPending = false;
+
+            }).error(function(response){
                 alert(2);
+            }).finally(function(response){
+                // vm.test = vm.newWallet;
             });
-
-
         };
 
         vm.close = function () {
-            $uibModalInstance.close('yes');
+            $uibModalInstance.close(vm.isNewWalletCreated);
         };
 
     });
@@ -63,19 +68,47 @@ angular.module('walletList')
 angular.module('walletList').component('walletList', {
     templateUrl: 'components/wallet-list/wallet-list.template.html',
     controllerAs: "walletListCtrl",
-    controller: ['Wallet', '$uibModal',
-        function WalletListController(Wallet, $uibModal) {
+    controller: ['Wallet', '$uibModal', '$rootScope', '$http',
+        function WalletListController(Wallet, $uibModal, $rootScope, $http) {
 
             var vm = this;
 
-            vm.test = 1111;
+            vm.wallets = [];
+            vm.loggedInUser = $rootScope.loggedInUser;
 
-            vm.message = 'It works!';
+            vm.isLoading = true;
+            vm.isNewWalletModalOpened = false;
+
+            vm.getUserWallets = function(){
+
+                vm.isLoading = true;
+
+                vm.wallets = [];
+                var data = {
+                    email: "test@mail.com"
+                };
+
+                var url = window.location.protocol+"//"+window.location.hostname+":8080/getUserAddresses";
+
+                $http.post(url, JSON.stringify(data)).success(function(response){
+
+                    for(var i = 0; i < response.length; i++){
+                        vm.wallets.push(response[i]);
+                    }
+                    vm.selectedWallet = vm.wallets[0];
+
+                    vm.isLoading = false;
+                }).error(function(response){
+                    alert(2);
+                });
+            };
+
+            vm.getUserWallets();
 
             var key = 1000;
 
-            vm.modal = function() {
-                var modalInstance = $uibModal.open({
+            vm.createNewWalletModal = function() {
+                vm.modalInstance = $uibModal.open({
                     controller: 'newWalletModalController as newWalletModalCtrl',
                     templateUrl: 'components/wallet-list/modal.html',
                     windowClass: 'center-modal',
@@ -85,72 +118,54 @@ angular.module('walletList').component('walletList', {
                         }
                     }
                 });
-                modalInstance.result.then(function(optionSelected) {
-                    if (optionSelected === 'yes') {
-                        console.log("Yes selected!")
+                vm.modalInstance.result.then(function(_isNewWalletCreated, _newWallet) {
+                    if (_isNewWalletCreated === true) {
+                        vm.getUserWallets();
+                        // alert(_newWallet.address);
+                        // vm.selectedWallet = _newWallet;
                     }
-                })
+                });
+
+                vm.modalInstance.opened.then(function () {
+                    vm.isNewWalletModalOpened = true;
+                });
+
+                vm.modalInstance.result.finally(function () {
+                    vm.isNewWalletModalOpened = false;
+                });
             };
 
-
-
-
-            vm.wallets = Wallet.query();
-            // this.orderProp = 'age';
-
-            // this.transactions = Transactions.query();
-
-
-            vm.loggedInUser = {
-                "firstName": "Jakub",
-                "lastName": "Słowik"
-            };
-
-            vm.getTotalBitcoinAmmount = function(){
+            vm.getTotalBitcoinAmount = function(){
                 var totalBitcoinAmmount = 0;
-                for(var wallet in vm.wallets){
-                    totalBitcoinAmmount += wallet.balance;
+                for(var i = 0; i < vm.wallets.length; i++){
+                    totalBitcoinAmmount += vm.wallets[i].balance;
                 }
                 return totalBitcoinAmmount;
             };
 
-            vm.test = "tesst";
+            vm.getTotalBitcoinAmount();
+
             vm.ammountToSend = 0;
-            vm.btcPrice = 1240;
+            vm.btcPrice = 2900;
 
-            vm.selectedWallet = {
-                "id": 0,
-                "balance": "0",
-                "name": "",
-                "address": "Please select your wallet"
+
+
+            vm.deleteWallet = function(){
+
+                var data = {
+                    id : vm.selectedWallet.id.toString()
+                };
+
+                var url = window.location.protocol+"//"+window.location.hostname+":8080/deleteWallet";
+
+                $http.post(url, JSON.stringify(data)).success(function(response){
+                   alert("wallet deleted");
+                    vm.getUserWallets();
+                }).error(function(response){
+                    alert(2);
+                });
             };
 
-            vm.isRemoveSignVisible = false;
-
-            vm.showRemoveSign = function () {
-                vm.isRemoveSignVisible = true;
-            };
-
-            vm.hideRemoveSign = function () {
-                vm.isRemoveSignVisible = false;
-            };
-
-            vm.deleteWallet = function (wallet) {
-                var index = vm.wallets.indexOf(wallet);
-                vm.wallets.splice(index);
-            }
-
-            vm.createNewWallet = function () {
-
-
-                // var newWallet = {
-                //     "id": "",
-                //     "name": "New wallet",
-                //     "balance": 0,
-                //     "address": "1EdVuraZCVhS2zi7eAevVtpHvPQtHtWdAR"
-                // };
-                // vm.wallets.push(newWallet);
-            }
         }
     ]
 

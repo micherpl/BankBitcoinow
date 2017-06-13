@@ -2,39 +2,36 @@
 
 angular.module('registration').component('registration', {
     templateUrl: 'components/registration/registration.template.html',
-    controller:  function RegistrationController($http) {
+    controller:  function RegistrationController($http, $location) {
 
 
         var vm = this;
 
-        vm.user = {
-            email: "",
-            password: ""
-        };
+        vm.email = "";
+        vm.password = "";
+        vm.serverErrors = {};
 
-        vm.register = function () {
+        vm.register = function() {
+            vm.serverErrors = {};
 
-
-            alert(3);
             var data = {
-                email: vm.user.email,
-                password: vm.user.password
+                email: vm.email,
+                password: vm.password
             };
 
-            var config = {
-                headers: {
-                    'Content-Type': 'application/json'
+            $http.post(window.location.protocol+'//'+window.location.hostname+':8080/registration', data).success(function(data){
+                $location.path('/start');
+            }).error(function(data){
+                if (data.errors) {
+                    for (var fieldName in data.errors.fields) {
+                        vm.serverErrors[fieldName] = data.errors.fields[fieldName];
+                    }
+                } else {
+                    console.log('Unknown response:', data);
+                    alert('Unexpected error. Please check logs or try again later.');
                 }
-            };
-
-
-            $http.get('http://localhost:8080/registration').success(function (data) {
-                alert(1);
-
-            }).error(function (data) {
-                alert(2);
             });
-        };
+        }
     },
     controllerAs: "registrationCtrl"
 

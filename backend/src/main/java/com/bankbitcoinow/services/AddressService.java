@@ -22,8 +22,8 @@ public class AddressService {
         addressRepository.save(address);
     }
 
-    public void getAddress(Long id){
-        addressRepository.findOne(id);
+    public Address getAddress(Long id){
+        return addressRepository.findOne(id);
     }
 
     public Address findByAddress(String address) {
@@ -38,6 +38,20 @@ public class AddressService {
         List<Address> addresses = new ArrayList<>();
         addressRepository.findAll().forEach(addresses::add);
         return  addresses;
+    }
+
+    public List<Address> getUserAddresses(Long user_id){
+        List<Address> allAddresses = new ArrayList<>();
+        List<Address> userAddresses = new ArrayList<>();
+
+        allAddresses = getAllAddresses();
+        for(Address address : allAddresses){
+            if (address.getUser().getId() == user_id){
+                userAddresses.add(address);
+            }
+        }
+
+        return userAddresses;
     }
 
 }

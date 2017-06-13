@@ -1,5 +1,7 @@
 @import url("fonts.css");
 @import url("modal.css");
+@import url("loader.css");
+@import url("animations.css");
 
 [ng\:cloak], [ng-cloak], .ng-cloak {
     display: none !important;
@@ -83,6 +85,11 @@
     -webkit-transform: translateY(-100%);
     -moz-transform: translateY(-100%);
     transform: translateY(-100%);
+}
+
+*{
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 body {
@@ -235,7 +242,7 @@ a:hover {
 }
 
 .create-new-wallet-btn{
-
+    margin-top: 15px;
 }
 
 .selected-wallet-balance{
@@ -266,6 +273,8 @@ a:hover {
     opacity: 1;
     height: 600px;
     border-radius: 2px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
     margin-top: 15px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.12);
 
@@ -283,9 +292,26 @@ a:hover {
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ffffff',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
 }
 
+
+.btn-wallet-item{
+   background-color: rgb(246,246,246);
+}
+
 .subsection-head {
     border: 0;
-    padding-bottom: 15px;
+    padding-bottom: 20px;
+    border-bottom: 1px;
+    border-style: solid;
+    border-bottom-color: #dfdfdf;
+}
+
+.panel-muted{
+    color: lightgray;
+}
+
+.wallets-subsection-head {
+    border: 0;
+    padding-bottom: 10px;
     border-bottom: 1px;
     border-style: solid;
     border-bottom-color: #dfdfdf;
@@ -294,6 +320,16 @@ a:hover {
 /*.create-wallet-btn:hover{*/
 /*background-color: #eb9316;*/
 /*}*/
+
+
+.wallets-refresh{
+    color: lightgrey; position:absolute; right: 10px; top: 12px;
+}
+
+.wallets-refresh:hover{
+   color: #f09342;
+}
+
 
 .footer {
     padding: 10px;

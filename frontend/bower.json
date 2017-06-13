@@ -1,26 +1,20 @@
 {
-  "name": "BitVault",
-  "description": "Your bitcoin bank",
-  "homepage": "https://github.com/micherpl/BankBitcoinow",
-  "authors": [
-    "Michał Herman",
-    "Paweł Kozioł",
-    "Jakub Słowik"
-  ],
+  "name": "angular-phonecat",
+  "description": "A starter project for AngularJS",
+  "version": "0.0.0",
+  "homepage": "https://github.com/angular/angular-phonecat",
+  "license": "MIT",
   "private": true,
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components",
-    "test",
-    "tests"
-  ],
   "dependencies": {
+    "angular": "1.5.x",
     "angular-animate": "1.5.x",
-    "angular-bootstrap": "^2.5.0",
     "angular-mocks": "1.5.x",
     "angular-resource": "1.5.x",
     "angular-route": "1.5.x",
-    "bootstrap": "3.3.x"
+    "bootstrap": "3.3.x",
+    "jquery": "2.2.x"
+  },
+  "devDependencies": {
+    "angular-bootstrap": "^2.5.0"
   }
 }
