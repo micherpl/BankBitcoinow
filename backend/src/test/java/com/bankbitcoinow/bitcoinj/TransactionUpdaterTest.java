@@ -212,7 +212,7 @@ public class TransactionUpdaterTest {
 	}
 
 	@Test
-	public void testUpdateAddressBalanceWhenOutcomingTransactionIsConfirmed() throws Exception {
+	public void testUpdateAddressBalanceWhenOutgoingTransactionIsConfirmed() throws Exception {
 		// Given
 		Transaction tx = mock(Transaction.class);
 		when(tx.getConfidence()).thenAnswer(invocation -> {
@@ -233,7 +233,7 @@ public class TransactionUpdaterTest {
 		dbTransaction.setId(123L);
 		dbTransaction.setStatus(TransactionStatus.UNCONFIRMED);
 		dbTransaction.setConfirmations(0);
-		dbTransaction.setAmount(new BigDecimal("1.50000000"));
+		dbTransaction.setAmount(new BigDecimal("-1.50000000"));
 		dbTransaction.setAddress(dbAddress);
 		dbTransaction.setSourceAddress(dbAddress.getAddress());
 
