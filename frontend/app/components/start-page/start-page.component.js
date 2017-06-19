@@ -3,60 +3,41 @@
 angular.module('startPage').component('startPage', {
     templateUrl: 'components/start-page/start-page.template.html',
     controllerAs: "startPageCtrl",
-    controller: function StartPageController($rootScope, $http, $location, $route) {
+    controller: function StartPageController($rootScope, $http, $location) {
 
         var vm = this;
 
-        // var authenticate = function(credentials, callback) {
-        //
-        //     var headers = credentials ? {
-        //         authorization : "Basic "
-        //         + btoa(credentials.username + ":"
-        //             + credentials.password)
-        //     } : {};
-        //
-        //     $http.get(window.location.protocol+'//'+window.location.hostname+':8080/user', {
-        //         headers : headers
-        //     }).then(function(response) {
-        //         if (response) {
-        //             // alert(1);
-        //             $rootScope.authenticated = true;
-        //         } else {
-        //             // alert(2);
-        //             $rootScope.authenticated = false;
-        //         }
-        //         callback && callback($rootScope.authenticated);
-        //     }, function() {
-        //         $rootScope.authenticated = false;
-        //         callback && callback(false);
-        //     });
-        //
-        // };
-        //
-        // authenticate();
+        $rootScope.authenticated = false;
 
         vm.credentials = {};
-        // vm.loginRequest = function() {
-        //     authenticate(vm.credentials, function(authenticated) {
-        //         if (authenticated) {
-        //             console.log("Login succeeded")
-        //             $location.path("/wallets");
-        //             vm.error = false;
-        //             $rootScope.authenticated = true;
-        //         } else {
-        //             console.log("Login failed")
-        //             $location.path("/start");
-        //             vm.error = true;
-        //             $rootScope.authenticated = false;
-        //         }
-        //     })
-        // };
 
+        $rootScope.loggedInUser = vm.credentials;
 
-        vm.tempLoginRequest = function() {
-            $rootScope.loggedInUser = vm.credentials;
-            vm.error = false;
-            $location.path("/wallets");
+        vm.isNewAccountRegistered = $rootScope.isNewAccountRegistered;
+        vm.newAccountEmail = $rootScope.newAccountEmail;
+
+        vm.login = function(){
+
+            var url = window.location.protocol+"//"+window.location.hostname+":8080/login";
+            //
+            // $http.post(url, JSON.stringify(data)).success(function(response){
+            //     vm.newWallet.address = response.address;
+            //     vm.newWallet.privateKey = response.privateKey;
+            //
+            //     vm.isNewWalletCreated = true;
+            //     vm.isWalletCreationPending = false;
+
+                $rootScope.isNewAccountRegistered = false;
+                vm.isNewAccountRegistered = false;
+                $rootScope.authenticated = true;
+                $location.path("/wallets");
+            // }).error(function(response){
+            //     console.log("error while creating new wallet");
+            // }).finally(function(response){
+            //     // vm.test = vm.newWallet;
+            // });
+            //
+
         };
 
         $rootScope.logout = function() {

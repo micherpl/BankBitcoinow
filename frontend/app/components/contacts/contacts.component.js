@@ -3,51 +3,47 @@
 angular.module('contacts').component('contacts', {
     templateUrl: 'components/contacts/contacts.template.html',
     controllerAs: "contactsCtrl",
-    controller: ['Wallet',
-        function ContactsController(Wallet) {
+    controller: ['$rootScope', '$location',
+        function ContactsController($rootScope, $location) {
 
 
-            // this.transactions = Transactions.query();
+            var vm = this;
 
+            vm.authenticated = $rootScope.authenticated;
 
-            // this.wallets = Wallet.query();
-            this.loggedInUser = {
-                "firstName": "Jakub",
-                "lastName": "Słowik"
+            if(!vm.authenticated){
+                $location.path("/start");
             };
 
-            this.contacts =
+            vm.btcPrice = 2850;
+            vm.totalBitcoinAmount = $rootScope.totalBitcoinAmount?$rootScope.totalBitcoinAmount:0;
+            vm.loggedInUser = {
+                email: $rootScope.loggedInUser.email?$rootScope.loggedInUser.email:""
+            };
+
+            vm.contacts =
                 [
                     {
                         "id": "1",
                         "name": "Kantor",
-                        "address": "1EdVuraZCVhS2zi7eAevVtpHvPQtHtWdAR"
+                        "address": "mhcxhd6pEEGNojxm6EYsoyp7JEkhoTvK9t"
                     },
                     {
                         "id": "2",
                         "name": "Michał Herman",
-                        "address": "1EdVuraZCVhS2zi7eAevVtpHvPQtHtWdAR"
+                        "address": "mgHFjNEUh2SJb5VZaC9csjT4Dd6MuGuki3"
                     },
                     {
                         "id": "3",
                         "name": "Paweł Kozioł",
-                        "address": "1EdVuraZCVhS2zi7eAevVtpHvPQtHtWdAR"
+                        "address": "mkrVYTRXBHucW1z9T1enEs7rcuVdm96Wyw"
                     },
                     {
                         "id": "4",
                         "name": "Satoshi Nakamoto",
-                        "address": "1EdVuraZCVhS2zi7eAevVtpHvPQtHtWdAR"
-                    },
+                        "address": "n1AXxNPAUoGpSTbNjCFnpsmod5XVMGWxrj"
+                    }
                 ];
-
-            this.getTotalBitcoinAmmount = function () {
-                var totalBitcoinAmmount;
-                for (var wallet in this.wallets) {
-                    totalBitcoinAmmount += wallet.balance;
-                }
-                return totalBitcoinAmmount;
-            };
-
 
         }]
 });

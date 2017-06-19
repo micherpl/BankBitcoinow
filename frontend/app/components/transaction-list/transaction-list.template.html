@@ -1,14 +1,10 @@
-<div class="container-fluid">
-
-
-
-
+<div class="container-fluid" ng-show="transactionListCtrl.authenticated">
     <div class="row">
         <div class="col-md-8 col-md-offset-2 main-section">
             <div class="row">
-                <div class="col-md-3">
-                    <h2 class="heading">Your account</h2>
-                    <h4 class="subheading">{{txCtrl.loggedInUser.firstName}} {{txCtrl.loggedInUser.lastName}} ({{txCtrl.getTotalBitcoinAmmount()}})</h4>
+                <div class="col-md-4">
+                    <h2 class="heading">{{transactionListCtrl.loggedInUser.email}}</h2>
+                    <h4 class="subheading"> (Total: {{transactionListCtrl.totalBitcoinAmount | number: 6}} BTC = {{transactionListCtrl.totalBitcoinAmount * transactionListCtrl.btcPrice | number: 2}} $)</h4>
                 </div>
 
                 <div style="float: right; margin-top: 30px; margin-left: 70px;" class="col-md-7 cl-effect-5">
@@ -18,8 +14,6 @@
                 </div>
             </div>
 
-
-
              <!--TRANSACTION LIST START-->
 
             <div class="col-md-12 subsection wallet-panel">
@@ -27,37 +21,33 @@
                 <div class="subsection-body">
                     <div class="row">
                         <div class="col-md-12 transactions-table">
-
-
-
-
-                            <table class="table ">
+                            <table class="table">
                                 <thead>
                                 <tr style="font-family: sourceSansPro-Regular;">
-                                    <th style="width: 5%"class="text-muted">#</th>
-                                    <th style="width: 20%">TxHash</th>
-                                    <th style="width: 19%">From</th>
-                                    <th style="width: 19%">To</th>
-                                    <th style="width: 7%;">Amount</th>
-                                    <th style="width: 10%">Date</th>
-                                    <th style="width: 10%;">Status</th>
-                                    <th style="width: 10%">Confirmations</th>
-
+                                    <th style="width: 3%"class="text-muted">#</th>
+                                    <th style="width: 10%">TxHash</th>
+                                    <th style="width: 30%">From</th>
+                                    <th style="width: 30%">To</th>
+                                    <th style="width: 8%;">Amount</th>
+                                    <th style="width: 14%">Date</th>
+                                    <th style="width: 12%;">Status</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr ng-repeat="tx in txCtrl.transactions">
+                                <tr ng-repeat="tx in transactionListCtrl.transactions">
                                     <th>{{$index + 1}}</th>
-                                    <td><a class="table-link" href="https://blockexplorer.com/tx/{{tx.tx_hash}}">{{tx.tx_hash}}</a></td>
-                                    <td><a href="https://blockexplorer.com/address/{{tx.source_address}}">{{tx.source_address}}</a></td>
-                                    <td><a href="https://blockexplorer.com/address/{{tx.destination_address}}">{{tx.destination_address}}</a></td>
+                                    <td><a class="table-link" href="https://www.blocktrail.com/tBTC/tx/{{tx.hash}}">{{tx.hash}}</a></td>
+                                    <td><a href="https://www.blocktrail.com/tBTC/address/{{tx.sourceAddress}}">{{tx.sourceAddress===tx.address.address?tx.address.address:tx.sourceAddress}}</a></td>
+                                    <td>
+                                        <a href="https://www.blocktrail.com/tBTC/address/{{tx.destinationAddress}}">{{tx.destinationAddress===tx.address.address?tx.address.address:tx.destinationAddress}}</a>
+                                        - {{tx.destinationAddress===tx.address.address?tx.address.alias:""}}
+                                    </td>
                                     <td style="font-family: sourceSansPro-Semibold">{{tx.amount}}</td>
-                                    <td>{{tx.created_at | date: 'short'}}</td>
-                                    <td ng-if="tx.status ==='Confirmed'" class="text-success">{{tx.status}}</td>
-                                    <td ng-if="tx.status ==='Prepared'" class="text-warning">{{tx.status}}</td>
-                                    <td ng-if="tx.status ==='Unconfirmed'" class="text-danger">{{tx.status}}</td>
-                                    <td ng-if="tx.status ==='Signed'" class="text-info">{{tx.status}}</td>
-                                    <td>{{tx.confirmations}}</td>
+                                    <td>{{tx.createdAt | date: 'dd-MM-yyyy - HH:mm:ss'}}</td>
+                                    <td ng-if="tx.status ==='CONFIRMED'" class="text-success"><span class="glyphicon btn-xs glyphicon-ok-circle"></span> {{tx.status}}</td>
+                                    <td ng-if="tx.status ==='PREPARED'" class="text-warning"><span class="glyphicon btn-xs glyphicon-unchecked"></span> {{tx.status}}</td>
+                                    <td ng-if="tx.status ==='UNCONFIRMED'" class="text-danger"><span class="glyphicon btn-xs glyphicon-remove-circle"></span> {{tx.status}}</td>
+                                    <td ng-if="tx.status ==='SIGNED'" class="text-info"><span class="glyphicon btn-xs glyphicon-pencil"></span> {{tx.status}}</td>
                                 </tr>
                                 </tbody>
                             </table>

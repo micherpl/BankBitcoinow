@@ -4,6 +4,7 @@ import com.bankbitcoinow.bitcoinj.BitcoinjFacade;
 import com.bankbitcoinow.bitcoinj.EncryptedKey;
 import com.bankbitcoinow.models.Address;
 import com.bankbitcoinow.models.User;
+import com.bankbitcoinow.services.TransactionService;
 import com.bankbitcoinow.services.UserService;
 import com.fasterxml.jackson.databind.util.JSONPObject;
 import org.bitcoinj.core.NetworkParameters;
@@ -32,6 +33,9 @@ public class AddressController {
     private AddressService addressService;
 
     @Autowired
+    private TransactionService transactionService;
+
+    @Autowired
     private UserService userService;
 
     @Autowired
@@ -40,11 +44,6 @@ public class AddressController {
     @Autowired
     private NetworkParameters networkParameters;
 
-    @RequestMapping(method = RequestMethod.POST, value="/dodaj_adres")
-    public void doTransaction(@RequestBody Address address) {
-        addressService.addAddress(address);
-
-    }
 
     @RequestMapping(method = RequestMethod.POST, value="/deleteWallet")
     public void deleteAddress(@RequestBody Map<String, String> input) {
@@ -56,12 +55,22 @@ public class AddressController {
         addressService.deleteAddress(id);
     }
 
+
+    private void updateAddressesBalances(List<Address> userAddresses) {
+        for(Address address : userAddresses){
+            double addressBalance = transactionService.getAddressBalance(address.getId());
+            address.setBalance(new BigDecimal(addressBalance));
+            addressService.updateAddress(address);
+        }
+    }
+
     @RequestMapping(method = RequestMethod.POST, value="/getUserAddresses")
     public @ResponseBody List<Address> getUserAddresses(@RequestBody Map<String, String> input) {
 
         Long user_id = userService.findByEmail(input.get("email")).getId();
         List<Address> userAddresses = addressService.getUserAddresses(user_id);
 
+        updateAddressesBalances(userAddresses);
         return userAddresses;
     }
 

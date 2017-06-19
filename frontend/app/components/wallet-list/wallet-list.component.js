@@ -1,25 +1,3 @@
-// 'use strict';
-//
-// // Register `phoneDetail` component, along with its associated controller and template
-// angular.
-//   module('walletDetail').
-//   component('walletDetail', {
-//     templateUrl: 'components/wallet-detail/wallet-list.template.html',
-//     controller: ['$routeParams', 'Wallet',
-//       function WalletDetailController($routeParams, Wallet) {
-//         var self = this;
-//         self.wallet = Wallet.get({walletId: $routeParams.walletId}, function(wallet) {
-//           // self.setImage(phone.images[0]);
-//         });
-//
-//         // self.setImage = function setImage(imageUrl) {
-//         //   self.mainImageUrl = imageUrl;
-//         // };
-//       }
-//     ]
-//   });
-
-
 
 'use strict';
 
@@ -32,12 +10,14 @@ angular.module('walletList')
         vm.isNewWalletCreated = false;
         vm.isWalletCreationPending = false;
 
+        vm.loggedInUser = $rootScope.loggedInUser;
+
         vm.generateWallet = function (){
 
             vm.isWalletCreationPending = true;
 
             var data = {
-                email: "test@mail.com",
+                email: vm.loggedInUser.email,
                 alias: vm.newWallet.alias,
                 password: vm.newWallet.password
             };
@@ -52,7 +32,7 @@ angular.module('walletList')
                 vm.isWalletCreationPending = false;
 
             }).error(function(response){
-                alert(2);
+                console.log("error while creating new wallet");
             }).finally(function(response){
                 // vm.test = vm.newWallet;
             });
@@ -68,12 +48,26 @@ angular.module('walletList')
 angular.module('walletList').component('walletList', {
     templateUrl: 'components/wallet-list/wallet-list.template.html',
     controllerAs: "walletListCtrl",
-    controller: ['Wallet', '$uibModal', '$rootScope', '$http',
-        function WalletListController(Wallet, $uibModal, $rootScope, $http) {
+    controller: ['$uibModal', '$rootScope', '$http', '$location',
+        function WalletListController($uibModal, $rootScope, $http, $location) {
 
             var vm = this;
 
+            vm.authenticated = $rootScope.authenticated;
+
+            if(!vm.authenticated){
+                $location.path("/start");
+            }
+
             vm.wallets = [];
+
+            vm.totalBitcoinAmount = 0;
+
+            vm.isTransactionPrepared = false;
+            vm.preparedTransactionWalletPassword = "";
+            vm.isPasswordPrompt = false;
+
+            vm.btcPrice = 2850;
             vm.loggedInUser = $rootScope.loggedInUser;
 
             vm.isLoading = true;
@@ -85,7 +79,7 @@ angular.module('walletList').component('walletList', {
 
                 vm.wallets = [];
                 var data = {
-                    email: "test@mail.com"
+                    email: vm.loggedInUser.email
                 };
 
                 var url = window.location.protocol+"//"+window.location.hostname+":8080/getUserAddresses";
@@ -96,10 +90,12 @@ angular.module('walletList').component('walletList', {
                         vm.wallets.push(response[i]);
                     }
                     vm.selectedWallet = vm.wallets[0];
-
                     vm.isLoading = false;
+                    $rootScope.totalBitcoinAmount = vm.getTotalBitcoinAmount();
+
+                    vm.totalBitcoinAmount = $rootScope.totalBitcoinAmount;
                 }).error(function(response){
-                    alert(2);
+                    console.log("error while getting user addresses");
                 });
             };
 
@@ -136,19 +132,19 @@ angular.module('walletList').component('walletList', {
             };
 
             vm.getTotalBitcoinAmount = function(){
-                var totalBitcoinAmmount = 0;
+                var totalBitcoinAmount = 0;
                 for(var i = 0; i < vm.wallets.length; i++){
-                    totalBitcoinAmmount += vm.wallets[i].balance;
+                    totalBitcoinAmount += vm.wallets[i].balance;
                 }
-                return totalBitcoinAmmount;
+                return totalBitcoinAmount;
             };
 
-            vm.getTotalBitcoinAmount();
 
-            vm.ammountToSend = 0;
-            vm.btcPrice = 2900;
+            vm.totalBitcoinAmount = $rootScope.totalBitcoinAmount;
 
 
+            vm.amountToSend = 0;
+            vm.destinationAddress = "";
 
             vm.deleteWallet = function(){
 
@@ -159,12 +155,62 @@ angular.module('walletList').component('walletList', {
                 var url = window.location.protocol+"//"+window.location.hostname+":8080/deleteWallet";
 
                 $http.post(url, JSON.stringify(data)).success(function(response){
-                   alert("wallet deleted");
+                   alert("Wallet deleted");
                     vm.getUserWallets();
                 }).error(function(response){
-                    alert(2);
+                    console.log("error while deleting wallet");
                 });
             };
+
+
+
+
+            vm.generateTransaction = function (){
+                vm.isTransactionPrepared = false;
+
+                vm.sourceAddress = vm.selectedWallet.address;
+
+                var data = {
+                    from : vm.sourceAddress,
+                    to : vm.destinationAddress,
+                    amount : vm.amountToSend
+                };
+
+                var url = window.location.protocol+"//"+window.location.hostname+":8080/prepareTransaction";
+
+                $http.post(url, JSON.stringify(data)).success(function(response){
+
+                    vm.isTransactionPrepared = true;
+                    vm.preparedTransactionFee = response.fee;
+                    vm.preparedTransactionId = response.id;
+                }).error(function(response){
+                    console.log("error while generating transaction");
+                    console.log(response.message);
+                    alert(response.message);
+                });
+            };
+
+
+            vm.sendTransaction = function (){
+
+                var data = {
+                    id : vm.preparedTransactionId,
+                    password : vm.preparedTransactionWalletPassword
+                };
+
+                var url = window.location.protocol+"//"+window.location.hostname+":8080/signTransaction";
+
+                $http.post(url, JSON.stringify(data)).success(function(response){
+                    vm.isTransactionPrepared = false;
+                    vm.isPasswordPrompt = false;
+                    vm.preparedTransactionWalletPassword = "";
+                }).error(function(response){
+                    console.log("error while signing transaction");
+                    console.log(response.message);
+                    alert(response.message);
+                });
+            };
+
 
         }
     ]

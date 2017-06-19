@@ -6,6 +6,7 @@ import com.bankbitcoinow.models.Address;
 import com.bankbitcoinow.models.Transaction;
 import com.bankbitcoinow.models.TransactionStatus;
 import com.bankbitcoinow.services.AddressService;
+import com.bankbitcoinow.services.UserService;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.InsufficientMoneyException;
 import org.bitcoinj.core.NetworkParameters;
@@ -18,8 +19,10 @@ import org.springframework.web.bind.annotation.*;
 import com.bankbitcoinow.services.TransactionService;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -33,6 +36,9 @@ public class TransactionController {
     private TransactionService transactionService;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private AddressService addressService;
 
     @Autowired
@@ -43,7 +49,7 @@ public class TransactionController {
 
     private final ConcurrentMap<Long, SendRequest> preparedSendRequests = new ConcurrentHashMap<>();
 
-    @RequestMapping(method = RequestMethod.POST, value="/przygotuj_przelew")
+    @RequestMapping(method = RequestMethod.POST, value="/prepareTransaction")
     public Map<String, Object> prepareTransaction(@RequestBody Map<String, String> input) throws InsufficientMoneyException {
         String from = input.get("from");
         Assert.hasText(from, "Source address cannot be empty");
@@ -90,7 +96,7 @@ public class TransactionController {
         return result;
     }
 
-    @RequestMapping(method = RequestMethod.POST, value="/podpisz_przelew")
+    @RequestMapping(method = RequestMethod.POST, value="/signTransaction")
     public void signTransaction(@RequestBody Map<String, String> input) throws IOException {
         String id = input.get("id");
         Assert.hasText(id, "ID cannot be empty");
@@ -122,9 +128,23 @@ public class TransactionController {
         bitcoinjFacade.broadcastTransaction(sendRequest);
     }
 
-    @RequestMapping(method = RequestMethod.GET, value="/wyswietl_wszystkie_transkacje")
-    public void getAllTransaction(@RequestBody Transaction transaction) {
-        transactionService.getAllTransactions();
+    @RequestMapping(method = RequestMethod.POST, value="/getUserTransactions")
+    public @ResponseBody List<Transaction> getUserTransactions(@RequestBody Map<String, String> input) {
 
+        Long user_id = userService.findByEmail(input.get("email")).getId();
+        List<Address> userAddresses = addressService.getUserAddresses(user_id);
+
+        List<Transaction> userTransactions = transactionService.getUserTransactions(userAddresses);
+
+        return userTransactions;
     }
+
+    @RequestMapping(method = RequestMethod.GET, value="/getAllTransactions")
+    public @ResponseBody List<Transaction> getAllTransaction() {
+        List<Transaction> allTransactions = transactionService.getAllTransactions();
+
+        return allTransactions;
+    }
+
+
 }

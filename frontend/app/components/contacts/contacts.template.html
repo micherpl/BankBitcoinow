@@ -1,14 +1,10 @@
-<div class="container-fluid">
-
-
-
-
+<div class="container-fluid" ng-show="contactsCtrl.authenticated">
     <div class="row">
         <div class="col-md-8 col-md-offset-2 main-section">
             <div class="row">
-                <div class="col-md-3">
-                    <h2 class="heading">Your account</h2>
-                    <h4 class="subheading">{{contactsCtrl.loggedInUser.firstName}} {{contactsCtrl.loggedInUser.lastName}} ({{contactsCtrl.getTotalBitcoinAmmount()}})</h4>
+                <div class="col-md-4">
+                    <h2 class="heading">{{contactsCtrl.loggedInUser.email}}</h2>
+                    <h4 class="subheading"> (Total: {{contactsCtrl.totalBitcoinAmount | number: 6}} BTC = {{contactsCtrl.totalBitcoinAmount * contactsCtrl.btcPrice | number: 2}} $)</h4>
                 </div>
 
                 <div style="float: right; margin-top: 30px; margin-left: 70px;" class="col-md-7 cl-effect-5">
@@ -18,10 +14,7 @@
                 </div>
             </div>
 
-
-
-             <!--TRANSACTION LIST START-->
-
+             <!--CONTACTS LIST START-->
             <div class="col-md-12 subsection wallet-panel">
                 <h3 class="subsection-head">Address book</h3>
                 <div class="subsection-body">
@@ -35,24 +28,23 @@
                                     <th style="width: 37.5%">Name</th>
                                     <th style="width: 42.5%">Address</th>
                                     <th style="width: 10%">Send transaction</th>
-
                                 </tr>
                                 </thead>
                                 <tbody>
                                 <tr ng-repeat="contact in contactsCtrl.contacts">
                                     <th>{{$index + 1}}</th>
                                     <td>{{contact.name}}</td>
-                                    <td><a href="https://blockexplorer.com/address/{{contact.address}}">{{contact.address}}</a></td>
+                                    <td><a href="https://www.blocktrail.com/tBTC/address/{{contact.address}}">{{contact.address}}</a></td>
                                     <td><button style="border-radius: 2px;" class="btn btn-xs btn-warning btn-send-transaction">Send transaction <span class="glyphicon-circle-arrow-right glyphicon"></span></button></td>
                                 </tr>
                                 </tbody>
                             </table>
-
                         </div>
                     </div>
                     <h4></h4>
                 </div>
             </div>
+            <!--CONTACTS LIST END-->
         </div>
     </div>
 

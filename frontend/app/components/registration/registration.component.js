@@ -2,7 +2,7 @@
 
 angular.module('registration').component('registration', {
     templateUrl: 'components/registration/registration.template.html',
-    controller:  function RegistrationController($http, $location) {
+    controller:  function RegistrationController($http, $location, $rootScope) {
 
 
         var vm = this;
@@ -20,6 +20,8 @@ angular.module('registration').component('registration', {
             };
 
             $http.post(window.location.protocol+'//'+window.location.hostname+':8080/registration', data).success(function(data){
+                $rootScope.isNewAccountRegistered = true;
+                $rootScope.newAccountEmail = vm.email;
                 $location.path('/start');
             }).error(function(data){
                 if (data.errors) {

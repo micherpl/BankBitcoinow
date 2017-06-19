@@ -2,6 +2,7 @@ package com.bankbitcoinow.services;
 
 
 import com.bankbitcoinow.models.Address;
+import com.bankbitcoinow.models.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.bankbitcoinow.repository.AddressRepository;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Service
 public class AddressService {
+
     @Autowired
     private AddressRepository addressRepository;
 
@@ -41,12 +43,11 @@ public class AddressService {
     }
 
     public List<Address> getUserAddresses(Long user_id){
-        List<Address> allAddresses = new ArrayList<>();
         List<Address> userAddresses = new ArrayList<>();
 
-        allAddresses = getAllAddresses();
+        List<Address> allAddresses = getAllAddresses();
         for(Address address : allAddresses){
-            if (address.getUser().getId() == user_id){
+            if (address.getUser().getId().equals(user_id)){    /// ==   (?)
                 userAddresses.add(address);
             }
         }

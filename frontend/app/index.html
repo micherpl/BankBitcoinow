@@ -45,10 +45,6 @@
     <script src="components/registration/registration.module.js"></script>
     <script src="components/registration/registration.component.js"></script>
 
-        <!--MOCK DATA INSTEAD OF JSON BECAUSE CORS DOES NOT ALLOW TO FETCH LOCAL JSON FILES THROUGH HTTP REQUESTS-->
-    <script src="mock-data/transactions.js"></script>
-    <script src="mock-data/registered-users.js"></script>
-
 
 </head>
 <body>
@@ -56,15 +52,15 @@
 <div class="row">
     <div class="header">
         <div class="col-md-8 col-md-offset-2">
-            <a href="/">
+            <a href="#!/start">
                 <img class="header-logo" src="../../assets/img/logo.png"/>
             </a>
 
             <div ng-show="authenticated" class="btn-group" uib-dropdown is-open="status.isopen">
-                <button type="button" class="btn btn-warning btn-profile-menu" uib-dropdown-toggle style="width: 160px; height: 35px;">
+                <button type="button" class="btn btn-warning btn-profile-menu" uib-dropdown-toggle style=" height: 35px;">
                           <span class="avatar">
                               <img src="../../assets/img/icons/avatar-default.png"/>
-                          </span>Jakub Słowik <span class="caret"></span>
+                          </span>{{loggedInUser.email}} <span class="caret"></span>
                 </button>
 
                 <ul class="dropdown-menu profile-menu" uib-dropdown-menu role="menu">
