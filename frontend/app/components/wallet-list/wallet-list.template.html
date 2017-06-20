@@ -1,0 +1,271 @@
+<div class="container-fluid" ng-show="walletListCtrl.authenticated">
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2 main-section">
+            <div class="row">
+                <div class="col-md-4">
+                    <h2 class="heading">{{walletListCtrl.loggedInUser.email}}</h2>
+                    <h4 class="subheading"> (Total: {{(walletListCtrl.totalBitcoinAmount | number: 8)*1}} BTC = {{walletListCtrl.totalBitcoinAmount * walletListCtrl.btcPrice  | number: 2}} $)</h4>
+                </div>
+
+                <div style="float: right; margin-top: 30px; margin-left: 70px;" class="col-md-7 cl-effect-5">
+                    <a href="#!/wallets"><span style="width: 150px" data-hover="Wallets">Wallets</span></a>
+                    <a href="#!/transactions"><span style="width: 180px" data-hover="Transaction list">Transaction list</span></a>
+                    <a href="#!/contacts"><span style="width: 150px" data-hover="Address book">Address book</span></a>
+                </div>
+            </div>
+
+                <div class="col-md-3 subsection">
+                    <div class="col-md-12 wallets-subsection-head">
+                        <h3>Wallets</h3>
+                        <span ng-class="{'rotate-one-time':walletListCtrl.rotate}"
+                              ng-mouseover="walletListCtrl.rotate=false;"
+                              ng-click="walletListCtrl.rotate=true; walletListCtrl.getUserWallets()"
+                              class="glyphicon btn-lg glyphicon-refresh wallets-refresh">
+                        </span>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12" ng-if="!walletListCtrl.isLoading">
+                            <div class="wallets-body">
+                                <div class="col-md-12" ng-if="walletListCtrl.wallets.length === 0">
+                                   <h5 style="margin-top: 400px;" class="text-muted ">You have no wallets. You can create one by clicking on the button below</h5>
+                                    <!--<span ng-if="!walletListCtrl.isNewWalletModalOpened" style="margin-top: 30px;" class="text-muted glyphicon glyphicon glyphicon-chevron-down bounce"></span>-->
+                                    <span class="text-muted glyphicon glyphicon glyphicon-chevron-down"></span>
+                                </div>
+                                <div ng-repeat="wallet in walletListCtrl.wallets">
+                                    <!--<a href="#!/wallets/{{wallet.id}}">-->
+                                    <div ng-click="walletListCtrl.selectedWallet = wallet" class="col-md-12 wallet-item">
+                                        <div style="border: 0; border-radius: 0px;  width: 100%;" class="btn btn-warning" ng-if="wallet.id === walletListCtrl.selectedWallet.id">
+                                            <h4 class="wallet-heading">{{wallet.alias}}</h4>
+                                            <h4 class="wallet-balance">{{(wallet.balance | number: 8)*1}} BTC </h4>
+                                        </div>
+                                        <div style="border: 0; border-radius: 0px; width: 100%;" class="btn btn-wallet-item btn-default" ng-if="wallet.id != walletListCtrl.selectedWallet.id">
+                                            <h4 class="wallet-heading">{{wallet.alias}}</h4>
+                                            <h4 class="wallet-balance">{{(wallet.balance | number: 8)*1}} BTC </h4>
+                                        </div>
+                                        <!--<span ng-if="walletListCtrl.isRemoveSignVisible" ng-click="walletListCtrl.deleteWallet(wallet)" style="position: absolute; right: 15px; top: 30px;"-->
+                                              <!--class="glyphicon glyphicon-remove remove-wallet">-->
+                                        <!--</span>-->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 wallets-footer">
+                                <div ng-click="walletListCtrl.createNewWalletModal()" class="create-new-wallet-btn btn btn-success">
+                                    <span class="glyphicon glyphicon-plus-sign"></span> Create new wallet
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--LOADER START-->
+                    <div style="margin-top: 200px;" ng-if="walletListCtrl.isLoading" class="sk-fading-circle">
+                        <div class="sk-circle1 sk-circle"></div>
+                        <div class="sk-circle2 sk-circle"></div>
+                        <div class="sk-circle3 sk-circle"></div>
+                        <div class="sk-circle4 sk-circle"></div>
+                        <div class="sk-circle5 sk-circle"></div>
+                        <div class="sk-circle6 sk-circle"></div>
+                        <div class="sk-circle7 sk-circle"></div>
+                        <div class="sk-circle8 sk-circle"></div>
+                        <div class="sk-circle9 sk-circle"></div>
+                        <div class="sk-circle10 sk-circle"></div>
+                        <div class="sk-circle11 sk-circle"></div>
+                        <div class="sk-circle12 sk-circle"></div>
+                    </div>
+                    <!--LOADER END-->
+                </div>
+
+
+
+            <!-- WALLET PANEL START-->
+                <div ng-if="walletListCtrl.wallets.length != 0" class="col-md-9 subsection wallet-panel fade-element-in">
+                    <h3 class="subsection-head">{{walletListCtrl.selectedWallet.alias}}</h3>
+
+                    <!-- TRANSACTION NOT YET GENERATED -->
+
+                    <div class="fade-element-in" ng-if="!walletListCtrl.isTransactionPrepared && !walletListCtrl.isPasswordPrompt">
+                        <div style="opacity: 0.35; margin-left: 7px; float: right;" ng-click="walletListCtrl.deleteWallet()" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-ban-circle"></span> Delete wallet</div>
+
+                        <a href="https://www.blocktrail.com/tBTC/address/{{walletListCtrl.selectedWallet.address}}">
+                            <div style="opacity: 0.85; float: right;" class="btn btn-warning btn-xs"><span class="glyphicon glyphicon-globe"></span> View in block explorer</div>
+                        </a>
+                        <div class="subsection-body">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-3 col-md-offset-9 selected-wallet-balance">
+                                        <h2>BALANCE</h2><h3 style="font-family: sourceSansPro-Semibold;">{{(walletListCtrl.selectedWallet.balance | number: 8)*1}} <span class="glyphicon glyphicon-bitcoin"></span></h3>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h4>Your address</h4>
+                                        <input class="form-control input-lg" type="text"
+                                               value="{{walletListCtrl.selectedWallet.address}}" readonly ng-model="walletListCtrl.selectedWallet.address">
+                                        <h1></h1>
+                                        <h4>Recipent address</h4>
+                                        <input class="form-control input-lg" type="text" ng-model="walletListCtrl.destinationAddress">
+                                        <h1></h1>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-10">
+                                        <h4>Amount to send</h4>
+                                        <div class="col-md-2 no-margin no-padding">
+                                            <input class="form-control input-lg" type="text" ng-model="walletListCtrl.amountToSend">
+                                        </div>
+                                        <div class="col-md-1">
+                                            <h4>BTC</h4>
+                                        </div>
+                                        <div class="col-md-1">
+                                            <h4>=</h4>
+                                        </div>
+                                        <div class="col-md-2 no-margin no-padding">
+                                            <input class="form-control input-lg" type="text" value="{{walletListCtrl.amountToSend * walletListCtrl.btcPrice | number: 2}}">
+                                        </div>
+                                        <div class="col-md-1">
+                                            <h4>USD</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div ng-click="walletListCtrl.generateTransaction()" class="col-md-3 col-md-offset-9 btn btn-warning btn-lg make-transaction-btn">
+                                        Generate transaction <span class="glyphicon glyphicon-arrow-right"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <h4></h4>
+                        </div>
+                    </div>
+
+                    <!-- TRANSACTION GENERATED -->
+
+                    <div class="fade-element-in" ng-if="walletListCtrl.isTransactionPrepared">
+                        <div class="subsection-body">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-6 col-md-offset-3">
+                                        <h2 style="font-family: sourceSansPro-Semibold">You are about to send <b style="font-family: sourceSansPro-Semibold; border-bottom-width: 2px; font-size: 35px; border-bottom-style: solid;">{{walletListCtrl.amountToSend}}</b> <span class="glyphicon glyphicon-bitcoin"></span></h2>
+                                        <h1></h1>
+                                        <h4>From</h4>
+                                        <input class="form-control input-lg" type="text"
+                                               value="{{walletListCtrl.sourceAddress}}" readonly>
+                                        <h1></h1>
+                                        <h4>To</h4>
+                                        <input class="form-control input-lg" type="text"
+                                               value="{{walletListCtrl.destinationAddress}}" readonly>
+                                        <h1></h1>
+                                        <h4>Transaction fee</h4>
+                                        <input class="form-control input-lg" type="text"
+                                               value="{{walletListCtrl.preparedTransactionFee}}" readonly ng-model="walletListCtrl.preparedTransactionFee">
+                                        <h1></h1>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <h1></h1>
+                                    <div ng-click="walletListCtrl.isTransactionPrepared = false" style="margin-left: 15px;" class="col-md-2 btn btn-default">
+                                        <span class="glyphicon glyphicon-arrow-left"></span> Back
+                                    </div>
+                                    <div ng-click="walletListCtrl.isPasswordPrompt = true; walletListCtrl.isTransactionPrepared = false;" class="col-md-3 col-md-offset-9 btn btn-warning btn-lg make-transaction-btn">
+                                        Send transaction <span class="glyphicon glyphicon-send"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <h4></h4>
+                        </div>
+                    </div>
+
+                    <!-- TRANSACTION GENERATED -->
+                    <div class="fade-element-in" ng-if="walletListCtrl.isPasswordPrompt">
+                        <div class="subsection-body">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-4 col-md-offset-4">
+                                        <h3 style="margin-top: 150px;" class="text-center">Wallet password</h3>
+                                        <input class="form-control input-lg" type="password"
+                                               value="{{walletListCtrl.preparedTransactionWalletPassword}}" ng-model="walletListCtrl.preparedTransactionWalletPassword">
+                                        <h1></h1>
+                                    </div>
+                                </div>
+                                <div class="row">
+
+                                    <div style="margin-bottom: 5px; text-align: center!important;" ng-click="walletListCtrl.sendTransaction()" class="col-md-2 col-md-offset-5 btn btn-warning btn-lg text-center">
+                                        CONFIRM
+                                    </div>
+                                    <h1></h1>
+                                    <div ng-click="walletListCtrl.isPasswordPrompt = false; walletListCtrl.isTransactionPrepared = true; " class="col-md-offset-5 col-md-2 btn btn-link">
+                                        Cancel
+                                    </div>
+                                </div>
+                            </div>
+                            <h4></h4>
+                        </div>
+                    </div>
+                </div>
+
+            <!--/WALLET PANEL END-->
+
+
+                <!-- WALLET PANEL DISABLED START-->
+                <div ng-if="walletListCtrl.wallets.length === 0" class="col-md-9 subsection wallet-panel">
+                    <div class="panel-muted">
+                    <h3 class="subsection-head">&nbsp</h3>
+                        <div style="visibility: hidden; opacity: 0.35; float: right;" ng-click="walletListCtrl.deleteWallet()" class="btn btn-default btn-xs" disabled><span class="glyphicon glyphicon-ban-circle"></span> Delete wallet</div>
+                        <div class="subsection-body">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-2 col-md-offset-10 selected-wallet-balance">
+                                    <h2>BALANCE</h2><h2 style="font-family: sourceSansPro-Semibold;">- <span class="glyphicon glyphicon-bitcoin"></span></h2>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h4>Your address</h4>
+                                    <input style="border-color: lightgray;" class="form-control input-lg" type="text"
+                                           value="{{walletListCtrl.selectedWallet.address}}" disabled>
+                                    <h1></h1>
+                                    <h4>Recipent address</h4>
+                                    <input style="border-color: lightgray;" class="form-control input-lg" type="text" value="" disabled>
+                                    <h1></h1>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <h4>Amount to send</h4>
+                                    <div class="col-md-2 no-margin no-padding">
+                                        <input style="color: lightgray; border-color: lightgray;" class="form-control input-lg" type="text" ng-model="walletListCtrl.ammountToSend" disabled>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <h4>BTC</h4>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <h4>=</h4>
+                                    </div>
+                                    <div class="col-md-2 no-margin no-padding">
+                                        <input style="color: lightgray; border-color: lightgray;" class="form-control input-lg" type="text" value="{{walletListCtrl.amountToSend * walletListCtrl.btcPrice | number: 2}}" disabled>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <h4>USD</h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div ng-click="walletListCtrl.generateTransaction()" class="col-md-3 col-md-offset-9 btn btn-warning btn-lg make-transaction-btn" disabled>
+                                    Generate transaction <span class="glyphicon glyphicon-arrow-right"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <h4></h4>
+                    </div>
+                    </div>
+                </div>
+                <!--/WALLET PANEL DISABLED END-->
+
+
+
+        </div>
+    </div>
+
+
+</div>
+
+
+</div>

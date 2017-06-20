@@ -8,6 +8,7 @@ import java.util.Set;
 @Entity
 @Table(name = "address")
 public class Address {
+    private String alias;
     private Long id;
     private String address;
     private byte[] privateKey;
@@ -28,6 +29,14 @@ public class Address {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
+
+    public String getAlias() {
+        return alias;
     }
 
     public String getAddress() {
