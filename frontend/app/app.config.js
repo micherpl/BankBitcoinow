@@ -4,6 +4,8 @@ angular.
 module('App').
 config(['$locationProvider' ,'$routeProvider', '$httpProvider',
     function config($locationProvider, $routeProvider, $httpProvider) {
+	    $httpProvider.defaults.withCredentials = true;
+
         $locationProvider.hashPrefix('!');
 
         // $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
