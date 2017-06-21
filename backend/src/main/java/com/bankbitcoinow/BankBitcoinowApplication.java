@@ -57,7 +57,8 @@ public class BankBitcoinowApplication {
 						.failureHandler(failureHandler())
 						.and()
 					.logout()
-						.logoutRequestMatcher(new AntPathRequestMatcher("/logout")).logoutSuccessUrl("/login");;
+						.logoutRequestMatcher(new AntPathRequestMatcher("/logout")).logoutSuccessUrl("/login")
+					.and().cors();
 			http.csrf().disable().formLogin();
 
 			http.authorizeRequests()
