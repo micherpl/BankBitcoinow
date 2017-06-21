@@ -1,0 +1,1 @@
+ALTER TABLE address ADD COLUMN alias CHARACTER(32);
